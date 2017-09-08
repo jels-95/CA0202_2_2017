@@ -1,0 +1,114 @@
+---
+title: "Un poco sobre funciones..."
+author: "Jorge Loría"
+date: "September 7, 2017"
+output: beamer_presentation
+---
+
+```{r setup, include=FALSE}
+#hook1 <- function(x){ gsub("```\n*```r*\n*", "", x) }
+#hook2 <- function(x){ gsub("```\n+```\n", "", x) }
+#knitr::knit_hooks$set(document = hook1)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Recapitulacion clase pasada
+
+Vimos que existen 5 tipos básicos de estructuras:
+
+>- Vectores
+
+>- Listas
+
+>- Matrices
+
+>- DataFrames
+
+>- Arrays
+
+## Principio
+
+> Todo lo que existe es un objeto, y todo lo que sucede es una llamada a una función
+- John Chambers
+
+\pause
+
+```{r}
+f1 <- function(x) x^2
+```
+
+\pause
+
+```{r}
+f1(10)
+```
+
+## Partes de las funciones en R
+
+- body()
+
+\pause
+
+```{r}
+body(f1)
+```
+
+\pause
+
+- formals()
+
+\pause
+
+```{r}
+formals(f1)
+```
+
+
+## La parte menos conocida
+
+\pause
+
+- environment()
+
+\pause
+
+```{r}
+environment(f1)
+```
+
+## Las funciones también son un objeto
+
+Por lo que puede ser parámetros de otras funciones, por ejemplo:
+
+```{r}
+x <- list(1:10,32:22,-1:20)
+sapply(x,sum)
+```
+
+## Yo Dawg'
+
+Entonces hay mucha flexibilidad con lo que se hace! Además, pueden definirse funciones dentro de otras funciones
+
+```{r}
+f2 <- function(x){
+  f3 <- function(y){
+    x+y
+  }
+  f3(5)
+}
+```
+
+
+```{r}
+f2(2)
+
+```
+
+
+
+
+
+
+
+
+
