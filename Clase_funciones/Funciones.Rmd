@@ -12,7 +12,7 @@ output: beamer_presentation
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Recapitulacion clase pasada
+## Recapitulación clase pasada
 
 Vimos que existen 5 tipos básicos de estructuras:
 
@@ -29,7 +29,7 @@ Vimos que existen 5 tipos básicos de estructuras:
 ## Principio
 
 > Todo lo que existe es un objeto, y todo lo que sucede es una llamada a una función
-- John Chambers
+- John Chambers (parafraseado)
 
 \pause
 
@@ -53,6 +53,7 @@ f1(10)
 body(f1)
 ```
 
+<!-----Que hubiera pasado si no pongo esta pausa y pongo la flecha como en la diapositiva anterior? ------>
 \pause
 
 - formals()
@@ -76,18 +77,47 @@ formals(f1)
 environment(f1)
 ```
 
-## Las funciones también son un objeto
+## Variables dentro de las funciones
 
-Por lo que puede ser parámetros de otras funciones, por ejemplo:
+Se pueden declarar _objetos_ dentro de las funciones:
 
 ```{r}
-x <- list(1:10,32:22,-1:20)
-sapply(x,sum)
+g1 <- function(x){
+  a <- 20
+  a + 10 + 2*x
+}
 ```
 
-## Yo Dawg'
+Al evaluar `g1(7)` se obtiene: \pause `r g1(7)` <!-----También se puede hacer una llamada de código en una linea------>
 
-Entonces hay mucha flexibilidad con lo que se hace! Además, pueden definirse funciones dentro de otras funciones
+\pause
+
+¿Cuál es el body de `g1`? ¿Y los formals? \pause ¿Qué pasa si se llama `g1` sin ponerle parámetros?
+
+## Variables externas
+
+Podemos tomar variables del ambiente exterior para llamar funciones:
+
+```{r}
+a <- 15
+g2 <- function(b) a + b^2
+```
+
+¿Qué valor toma `g2(3)`? \pause `r g2(3)` 
+\pause
+
+Por lo que al evaluar una función, si no se tiene una variable en el ambiente actual, se busca en el ambiente que está 
+justo superior a este. Y si no se encuentra se vuelve a subir y así sucesivamente...
+
+
+## Funciones dentro de funciones
+
+
+
+## _Yo Dawg'_
+![Meme obligatorio:](Yo-Dawg-Heard-You.jpg)
+
+## Funciones dentro de funciones
 
 ```{r}
 f2 <- function(x){
@@ -98,16 +128,120 @@ f2 <- function(x){
 }
 ```
 
+¿Qué creen que pase en esta función? ¿Cual es el `body` de `f2`? ¿Qué pasa si se intenta llamar a f3? ¿Se puede?
+
+\pause
+
+Entonces hay mucha flexibilidad con lo que se hace! Además, porque se pueden definir funciones dentro de otras funciones
+
+
+\pause
 
 ```{r}
 f2(2)
+# f3(1)
+```
 
+## Ambiente de _f3_
+
+```{r}
+f2 <- function(x){
+  f3 <- function(y){
+    x+y
+  }
+  print(environment(f3))
+  f3(5)
+}
+
+f2(2)
 ```
 
 
+## _Las funciones también son un objeto_
+
+Por lo que puede ser parámetros de otras funciones, o incluso el objeto que se obtiene de una función, por ejemplo:
+
+
+```{r}
+fun1 <- function(x){
+  y <- 2
+  function() x - y^2
+}
+
+fun2 <- fun1(20)
+```
+
+¿Cuánto vale ahora `fun2()`? \pause `r fun2()` \pause
+El ambiente de `fun2` ya no es el global: \pause 
+
+```{r}
+environment(fun2)
+```
+## 
+
+¿Qué cree que pase con el valor de `fun2` después del siguiente chunk?
+
+```{r,eval=FALSE}
+y <- 3
+fun2()
+```
+
+\pause 
+
+```{r,echo=FALSE}
+y <- 3
+fun2()
+```
+
+\pause
+
+¿Qué se obtiene como body de `fun2`? formals? Y si se llama sin ponerle los paréntesis?
+
+## Funciones como parámetro:
+
+```{r}
+x <- list(1:3,10:15,21:23)
+sapply(x,sum)
+```
+
+Qué hace sapply?
+
+\pause
+
+```{r}
+sapply(x,mean)
+```
+
+Recibe 2 objetos, una lista y una función que le aplica a cada entrada de la lista. \pause Existe toda una familia de funciones de apply, que incluye: lapply, mapply, vapply, tapply, entre otras...
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##
 
 
 
