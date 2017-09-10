@@ -1,7 +1,7 @@
 ---
 title: "Un poco sobre funciones..."
 author: "Jorge Loría"
-date: "September 7, 2017"
+date: "Sept 11, 2017"
 output: beamer_presentation
 ---
 
@@ -10,6 +10,7 @@ output: beamer_presentation
 #hook2 <- function(x){ gsub("```\n+```\n", "", x) }
 #knitr::knit_hooks$set(document = hook1)
 knitr::opts_chunk$set(echo = TRUE)
+library(magrittr)
 ```
 
 ## Recapitulación clase pasada
@@ -109,6 +110,61 @@ g2 <- function(b) a + b^2
 Por lo que al evaluar una función, si no se tiene una variable en el ambiente actual, se busca en el ambiente que está 
 justo superior a este. Y si no se encuentra se vuelve a subir y así sucesivamente...
 
+## Lazy evaluation
+
+Las funciones no **ocupan** recibir parámetros que no usen. Por lo que hay ciertas funciones en las que si uno no pone parámetros y no se van a usar, entonces no tira error:
+
+\pause
+```{r}
+falta <- function(a,b){ a^3 - 2}
+falta(a = 2)
+falta(a = 3,b = 2)
+```
+
+\pause
+
+Sin embargo, si se intenta llamar declarando `b = 2`, sin declarar un valor para `a`, sí va a tirar error. \pause R tira error hasta que se topa que ocupa la variable.
+
+## Parámetros pre-definidos
+
+Se le puede indicar a una función un valor que debe tomar uno de sus parámetros en caso de que este no sea declarado en la llamada:
+
+```{r}
+pre_def <- function(w, x = 3){w^x}
+pre_def(4)
+```
+
+\pause
+Y si se quiere incluir, se puede incluir:
+
+```{r}
+pre_def(4,2)
+```
+
+## Una aclaración
+
+Si la función espera recibir un parámetro, ya se "quema" ese nombre del ambiente actual. Entonces no va a intentar buscarlo más arriba:
+
+```{r}
+a <- 1
+func_prueba <- function(a,b){a^2 + b^3}
+```
+
+Por lo que si se intenta hacer el llamado: `func_prueba(b = 1)`, se obtiene un **error** pues no se tiene esa variable "definida"
+
+## Pregunta
+
+\pause
+
+### ¿Qué cree que pasa si uno intenta llamar una función desde adentro de otra función? ¿Y porqué?
+
+\pause
+
+Si llamamos una función desde otra función, recordando que todo en R es un objeto, entonces va a ir a buscar primero al ambiente en el que está la llamada, si no lo encuentra va a ir un ambiente para arriba, y la busca y así sucesivamente hasta que lo encuentre o que se de cuenta que no está definido, en cuyo caso tira un error.
+
+\pause
+Pero entonces, si el comportamiento de las funciones es tan _flexible_ podemos...
+
 
 ## Funciones dentro de funciones
 
@@ -129,18 +185,16 @@ f2 <- function(x){
 ```
 
 ¿Qué creen que pase en esta función? ¿Cual es el `body` de `f2`? ¿Qué pasa si se intenta llamar a f3? ¿Se puede?
-
-\pause
-
-Entonces hay mucha flexibilidad con lo que se hace! Además, porque se pueden definir funciones dentro de otras funciones
-
-
 \pause
 
 ```{r}
 f2(2)
 # f3(1)
 ```
+
+\pause
+
+¡Hay mucha flexibilidad con lo que se hace! Pues se pueden definir funciones dentro de otras funciones.
 
 ## Ambiente de _f3_
 
@@ -149,7 +203,7 @@ f2 <- function(x){
   f3 <- function(y){
     x+y
   }
-  print(environment(f3))
+  print(environment(f3)) # Para imprimir en consola, pero no termina la función
   f3(5)
 }
 
@@ -177,9 +231,10 @@ El ambiente de `fun2` ya no es el global: \pause
 ```{r}
 environment(fun2)
 ```
+
 ## 
 
-¿Qué cree que pase con el valor de `fun2` después del siguiente chunk?
+¿Qué cree que pase con el valor de `fun2` después del siguiente `chunk`?
 
 ```{r,eval=FALSE}
 y <- 3
@@ -204,7 +259,9 @@ x <- list(1:3,10:15,21:23)
 sapply(x,sum)
 ```
 
-Qué hace sapply?
+\pause
+
+¿Qué hace sapply?
 
 \pause
 
@@ -212,25 +269,134 @@ Qué hace sapply?
 sapply(x,mean)
 ```
 
-Recibe 2 objetos, una lista y una función que le aplica a cada entrada de la lista. \pause Existe toda una familia de funciones de apply, que incluye: lapply, mapply, vapply, tapply, entre otras...
+Es _como_ un funcional (460?) recibe 2 objetos, una lista y una función que le aplica a cada entrada de la lista. \pause Existe toda una familia de funciones de apply, que incluye: lapply, mapply, vapply, tapply, entre otras...
+
+## sapply vs lapply
 
 
+¿Cuál es la diferencia entre el llamado de `sapply(x,sum)` y `lapply(x,sum)`?
+\pause
+
+```{r}
+sapply(x,sum)
+lapply(x,sum)
+```
+
+## Ejemplos de sapply
+
+```{r}
+sumo <- function(x,y) x + y
+sapply(1:10,sumo,-10)
+```
+
+\pause
+También se puede usar la función `+` que viene pre-definida:
+
+\pause
+
+```{r}
+sapply(1:10,`+`,-10)
+sapply(1:10,"+",-10)
+```
+
+## Funciones `Infix` 
+
+Estas funciones son como el `+`, el `-`, el `*`, el `%*%` (de la tercera tarea, para multiplicar matrices), etc... En el sentido de que reciben dos parámetros, uno antes y otro después de escribirlos:
+
+```{r}
+`%-%` <- function(a,b) paste0(a,'-',b)
+`%-%`('No','sé')
+```
+
+\pause
+```{r}
+'No' %-% 'sé' %-% 'que' %-% 'poner'
+```
+
+También se pueden llamar las funciones usuales usando esta primera notación, pero obviamente es más natural usar la segunda:
+
+```{r}
+`+`(3.452574,4.700641)  == 3.452574 + 4.700641
+```
+
+<!---Quiero ver si puedo incluir el ejemplo de sapply y `[`--->
+
+## Composición de funciones
+
+Cuando se quieren hacer operaciones un poco más complejas en las cuales se requieran "componer" funciones de forma inmediata, lo que hace R es que va llamándolas por capas comenzando por la primera, y va subiendo hasta llegar al resultado final:
+
+```{r}
+sum(floor(log(cumsum(sqrt(1:100)))))
+```
+
+\pause
+
+Cuando uno programa siempre se tiene que intentar ser lo más claro posible. Pues eventualmente alguien va a llegar a leer el código (ya sea la misma persona que lo programó, o alguien más) y va a tener que lidiar con _eso_ (leer con tono despectivo). \pause Es por esto que...\pause vamos a usar nuestra primera librería:
+
+## Primera librería
+
+Para instalarlo:
+
+```{r,eval = FALSE}
+install.packages('magrittr') 
+# En general es cambiar 'magrittr', 
+# por la librería que se quiere
+```
+
+\pause
+
+Para usarlos hay 2 opciones, se pueden accesar las funciones usando `magrittr::funcion_que_voy_a_usar(x,y,z)` (obvio esta no existe), \pause o se puede cargar la librería usando el comando `library(magrittr)`, y luego solo se llama la función como cualquier otra `funcion_que_voy_a_usar(x,y,z)`. \pause En algunas librerías hay información extra sobre las funciones que pone a disposición, se puede accesar usando el comando `vignette('magrittr')`.
+
+## Pipes:
+
+!['Esto no es una pipa - Magritte'](The-Treachery-of-Images.jpg){width=80% }
 
 
+## `%>%`
+
+Este comando permite evaluar la expresión anterior al comando en la función que sigue. Es decir, `x %>% f()` es equivalente a `f(x)`. \pause Por lo que al concatenar funciones, como en el ejemplo anterior, se puede hacer que: `f(g(x))` sea equivalente a `x %>% g() %>% f()`. Esto da mayor claridad a la hora de hacer composición de funciones en R:
+
+\pause
+
+```{r}
+1:100 %>%
+  sqrt() %>%
+  cumsum() %>%
+  log() %>%
+  floor() %>%
+  sum()
+```
 
 
+\pause
+
+Lo cual es un poco más claro en el orden de operaciones que se realizan.
 
 
+## Una función muy importante, y otra "útil"
+\pause ... que ya deberían conocer de progra:
 
+\pause
 
+#### if & else
+\pause
+```{r}
+x <- 15
+if(x< 20) 25 else 35
+```
 
+\pause
 
+#### for
 
+\pause
 
+```{r}
+suma <- 0 
+for(numero in 1:15) suma <- suma + numero
 
-
-
-
+suma
+```
 
 
 
