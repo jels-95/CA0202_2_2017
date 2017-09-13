@@ -328,12 +328,41 @@ sapply(l1,`[`,15)
 
 Además, preserva los nombres de la lista, pero lo pasa a vector. Por lo que los números pasan a ser characters.
 
+## Ejercicio
+
+Programe una función que recibe 3 parámetros:
+
+- Un tiempo n, entero positivo
+- Vector de tasas variables futuras
+- Monto que se invierte hoy
+
+La función debe retornar el valor del monto al inicio del año n, reinvirtiéndolo cada año con la tasa que corresponde para ese año.
+
+Para comprobar, utilice las tasas: `c(0.05,0.06,0.045,0.069,0.073)`, y el tiempo `3`, con un monto de `1200`, que le debe dar: `r cumprod(1+c(0.05,0.06,0.045,0.069,0.073))[3]*1200`. 
+
+_Sugerencia:_ busque la función `cumprod`
+
+\pause 
+
+Si quisiera llamar esta función con varios tiempos, ¿cómo lo haría? Hágalo con los tiempos de 1 a 3.
+
+## Solución:
+
+```{r}
+intereses <- c(0.05,0.06,0.045,0.069,0.073)
+montosVP <- function(n,intereses,monto){
+  cumprod(1+intereses)[n]*monto
+} 
+sapply(1:3,montosVP,intereses,1200)
+```
+
+
 ## Funciones `Infix` 
 
 Estas funciones son como el `+`, el `-`, el `*`, el `%*%` (de la tercera tarea, para multiplicar matrices), etc... En el sentido de que reciben dos parámetros, uno antes y otro después de escribirlos:
 
 ```{r}
-`%-%` <- function(a,b) paste0(a,'-',b)
+`%-%` <- function(a,b) paste0('{',a,'-',b,'}')
 `%-%`('No','sé')
 ```
 
@@ -359,7 +388,7 @@ Esto permite concatenar de forma natural estas operaciones, como cuando uno pone
 'Esta' %-% 'frase' %-% 'puede' %-% 'ser' %-% 'muy' %-% 'larga'
 ```
 
-
+Nótese que se compone comenzando por el lado izquierdo.
 
 
 ## Composición de funciones
@@ -421,36 +450,55 @@ Lo cual es un poco más claro en el orden de operaciones que se realizan, y nos 
 \pause
 
 ```{r}
-x <- 15
-if(x< 20) 25 else 35
+Mi_if_1 <- function(x){
+  if(x< 20) 25 else 35
+}
+Mi_if_1(18)
+Mi_if_1(21)
 ```
 
-\pause
+
+## Usando corchetes:
+
 
 ```{r}
-if(x > 18){
-  a <- 20
-} else { 
-  a <- 1:20
+Mi_if_2<- function(x){
+  if(x > 18){
+    return(20)
+  } else { 
+    return(1:20)
+  }
 }
-a
+Mi_if_2(15)
+Mi_if_2(22)
 ```
+
+## Return
+
+Las funciones pueden retornar cualquier clase de objeto, para ser explícitos (y para mayor claridad) se puede usar el comando `return`. Esto es principalmente valioso cuando se quiere evitar un cálculo molesto y largo desde el principio, y se quiere devolver el valor desde el inicio.
 
 ## ifelse vectorial
 
-Muchas veces se quieren trabajar de forma vectorial los condicionales. Por lo que lo programaron de forma vectorial.
+Muchas veces se quieren trabajar de forma vectorial los condicionales. Por lo que existe una versión vectorial.
 
 ```{r}
-d <- ifelse(1:15 < 10, 5, 3)
+
+Mi_if_3 <- function(x){
+  v1 <- ifelse(x< 10, 5, 3)
+  return(v1)
+}
 ```
 
 \pause
 
+Si le mandamos un vector, se obtiene un resultado satisfactorio. Mientras las otras funciones devuelven algún tipo de error
+
 ```{r}
-d
+Mi_if_3(1:15)
 ```
 
-Si se intenta el llamado anterior con un `if`, da un error:
+
+Si se intenta el llamado anterior con un `if` normal, da un error:
 
 ```{r}
 abc <- if(1:15 < 10) 5 else 3
@@ -459,6 +507,50 @@ abc
 
 
 
+
+## for
+
+Algunas veces las funciones vectoriales y los applys no son suficientes para las tareas que se tienen que desempeñar. Por lo que R, también cuenta con `for` 
+
+
+```{r}
+for(i in 1:12) print(i)
+```
+
+\pause
+
+## Otro _for_
+
+```{r}
+mi_iterador <-  function(vector1){
+  # l1 <- length(vector1)
+  v1 <- vector(length = length(vector1),mode = 'numeric')
+  # rep(0,length(vector1))
+  for(num in 1:(length(vector1) - 1 )){
+    v1[num] <- vector1[num+1] / vector1[num]
+  }
+  return(v1)
+}
+```
+
+\pause
+
+
+```{r}
+mi_iterador(seq(from = 12, to = 1400,by = 347))
+```
+
+
+## Ejercicio
+
+Ajuste la función que hizo al principio de la clase, de forma tal que si recibe un _n_ mayor a la longitud del vector que se tiene, devuelva un valor de 0.
+
+\pause
+
+Para realmente terminar de apreciar el valor de las funciones vectoriales, repita la función, pero esta vez utilizando un `for`.
+
+
+<!-----
 ## Una función 'útil'
 
 #### for
@@ -471,17 +563,80 @@ for(numero in 1:15) suma <- suma + numero
 
 suma
 ```
-
 En R el `for` no es tan útil, pues muchas de las cosas se manejan por medio de vectores usando operaciones vectoriales, o `apply`s
+---->
 
 
 
 
+## Funciones de reemplazo
+
+Estas funciones modifican uno de sus argumentos, y le _reemplazan_ el valor de alguna de sus características:
+
+\pause
+```{r}
+v1 <- 1:15
+names(v1)
+names(v1) <- letters[1:15]
+```
+
+\pause
+
+```{r}
+names(v1)
+```
+
+## Definiendo funciones de reemplazo
+
+Para definir estas funciones, se debe usar la sintaxis \`xxx<-\` (sin espacios!) y luego definirla, y luego retornarla con la modificación. Por ejemplo:
+
+```{r}
+`tercera<-` <- function(x,value){
+  x[3] <- value
+  x
+}
+```
+
+El parámetro de `value` debe tener ese nombre, pues de lo contrario da un error a la hora de llamarlo.
+
+\pause
+Y para llamarla, se usa la misma sintaxis que con `names` 
+```{r}
+v1 <- 1:7
+tercera(v1) <- 15075
+v1
+```
+
+Si se intenta llamar `tercera(v1)` sin asignarle un valor, se recibe un error. Pues solo se tiene la definición del "set", pero no del "get". 
+\pause
+
+Defina una función que se llame tercera, que haga el get.
+
+## Reemplazo con entrada
+
+Si se quiere tener más flexibilidad con la definición del reemplazo se puede incluyendo más parámetros. Los cuales deben estar entre el parámetro x y el value en la definición.
+
+```{r}
+`modifica<-` <- function(x,entrada,value){
+  x[entrada] <- value
+  x
+}
+```
+
+\pause
+
+```{r}
+modifica(v1,4) <- 49.7
+v1
+```
 
 
 
+## Próximamente:
 
-##
+
+
+### DataFrames :)
 
 
 
