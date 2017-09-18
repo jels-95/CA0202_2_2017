@@ -1,0 +1,562 @@
+---
+title: "Dataframes"
+author: "Jorge Loría"
+date: "Sept 18, 2017"
+output: beamer_presentation
+classoption: aspectratio=169
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+```
+
+## Creando el primero
+
+Muchas veces se quieren ordenar datos de forma rectangular (como una matriz), pero se quiere que sean de varios tipos. Por ejemplo:
+
+\pause
+
+```{r}
+personas <- data.frame(Nombre = c('Pablo','Ana',
+                                  'Fernando','Maria'),
+                 Edad = c(26,25,19,24),
+                 Sexo = c('M','F','M','F'),
+                 Provincia = c('San Jose','Cartago',
+                              'Limon','Limon'),
+                 Asegurado = c(TRUE,TRUE,FALSE,FALSE))
+personas
+```
+
+##
+
+En muchos sentidos se comportan como una lista, pero con la restricción de que cada una de sus entradas debe ser un vector con la misma cantidad de entradas. \pause Por ejemplo, para accesar una variable se puede utilizar `$`:
+
+
+```{r}
+personas$Nombre
+```
+
+Pero también se comportan como matriz:
+
+```{r}
+personas[1:2,1:3]
+```
+
+
+## 
+
+Y si se quieren varias columnas, completas, se pueden accesar de esta forma:
+
+```{r}
+personas[3:4]
+```
+
+\pause
+
+O se puede accesar a una columna como si el data.frame fuera, efectivamente, una lista:
+
+```{r}
+personas[[2]]
+```
+
+
+## Se accesa con vectores
+
+Por lo que se puede accesar con un vector así:
+
+```{r}
+personas[c(1,4,5)]
+```
+
+## También funciona como matriz/vector
+
+Si se quieren accesar ciertas entradas de un vector, se puede hacer de la siguiente forma:
+
+```{r}
+personas[personas$Sexo == 'F',]
+```
+
+Note la coma, si esta no se coloca se obtiene un resultado inesperado. \pause ¿Qué se obtiene si no se pone la coma? Obtenga las personas cuya edad es mayor a 20.
+
+\pause
+
+```{r}
+personas[personas$Edad>20,]
+```
+
+
+##
+
+La forma en que R indexa es _inteligente_, por lo que si se quiere obtener únicamente los valores de una columna usando el método anterior se puede hacer:
+
+```{r}
+personas[personas$Sexo == 'F','Edad']
+```
+
+El cual da un vector como resultado.
+\pause
+
+Obtenga el vector que corresponde a las provincias de las personas que están aseguradas. \pause
+
+```{r}
+personas[personas$Asegurad,'Provincia']
+```
+
+
+## Suave un toque
+
+Si le pedimos el tipo (`typeof`) a la columna de Provincia, ¿qué obtenemos? \pause 
+
+```{r}
+typeof(personas$Provincia) 
+# typeof(personas[,'Provincia'])
+# typeof(personas[,4])
+# typeof(personas[[4]])
+```
+
+
+Pero... lo habíamos definido como un string, ¿por qué lo interpreta como un número?
+\pause
+
+Resulta, que R en los dataframes se asume que los strings son _factors_. \pause Ok, muy bien. Pero, ¿qué es un factor?
+
+## Pausa de _factors_
+
+Los _factors_ son para variables (columnas) categóricas, o sea aquellas que indican que una variable tiene una cantidad discreta de opciones (por ejemplo, el sexo, la provincia). 
+
+```{r}
+x <- factor(c('San Jose','Alajuela','Cartago','San Jose'))
+x
+```
+
+
+\pause
+También pueden forzarse valores numéricos a ser factores:
+```{r}
+y <- factor(c(1,3,1,4,1,2,6,5))
+y
+```
+
+## Con los números es **más** molesto
+
+Pues los niveles que se asignan no necesariamente coinciden con los que realmente toman:
+
+```{r}
+y
+levels(y)
+```
+
+
+## Pausa de _factors_
+
+Noten que los factores no tienen cómo saber si faltan variables, por ejemplo con las provincias solo se incluyen las 3 que indicamos, pero si luego quisiéramos _juntarle_ observaciones con variables con nuevas provincias vamos a tener problemas:
+
+```{r}
+x2 <- c(x,'Heredia')
+x2
+```
+
+Pues toma el valor que le está asignando internamente para referirse a los valores que tenia para `x`. \pause Para remediar esto, se usa `as.character`
+
+
+```{r}
+x3 <- c(as.character(x),'Heredia')
+x3
+```
+\pause
+Para conocer todos los valores que toma un vector de factors, se usa la función `levels`.
+
+## Continuamos con dataframes
+
+De forma predefinida, los _characters_ en los dataframes se interpretan como _factors_, lo cual puede ser problemático:
+
+```{r}
+str(personas)
+```
+
+## 
+
+Por lo que, se puede mandar como parámetro opcional que los strings no sean _factors_, cambiando el parámetro `stringsAsFactors = FALSE`, al definir el data.frame
+
+\pause
+
+```{r}
+personas <- data.frame(Nombre = c('Pablo','Ana','Fernando','Maria'),
+                 Edad = c(26,25,19,24),
+                 Sexo = c('M','F','M','F'),
+                 Provincia = c('San Jose','Cartago','Limon','Limon'),
+                 Asegurado = c(TRUE,TRUE,FALSE,FALSE),
+                 stringsAsFactors = FALSE)
+str(personas)
+```
+
+
+## Accesar vectores
+
+Por lo que si ahora accesamos una de estas variables 
+
+```{r}
+personas$Nombre
+```
+
+```{r}
+personas$Provincia
+```
+
+Obtenemos los valores propiamente, en lugar de obtener los niveles que obteníamos antes. \pause Revise que efectivamente el tipo de estas columnas es ahora `character`, usando la variable
+
+
+## Definir nuevas variables
+
+Para definir nuevas variables en un dataframe es como lo hacíamos en una lista:
+
+```{r}
+personas$Antiguedad <- c(5,3,1,2)
+personas['Casado'] <- c(TRUE,TRUE,TRUE,FALSE)
+personas['Apellido'] <- c('Gonzalez','Solano','Vargas','Solis')
+str(personas)
+```
+
+
+<!--------
+## Resumir dataframes
+
+Muchas veces cuando uno se topa con una base de datos por primera vez, y quiere identificar la estructura que tiene esta y cómo está o
+------------>
+
+## Dataframes con dplyr 
+
+Parte de lo que vamos a aprender es a utilizar los **verbos** que vienen en la librería `dplyr`. Que tiene bastantes opciones para la manipulación más sencilla de los data frames.
+
+
+```{r,eval=FALSE}
+install.packages('dplyr')
+```
+
+
+```{r,warning=FALSE,message=FALSE}
+library(dplyr)
+```
+
+
+## Los verbos
+
+Hay 6 verbos básicos en `dplyr` que vamos a ver con detenimiento: <!---~~5~~------>
+
+|	función		    |acción		  |
+|-------------:|:----------|
+|   `filter`      | conserva filas que cumplan la condición			|
+|   `arrange`     | ordena las filas según el orden |
+|   `select`      | conserva/elimina las columnas por su nombre |
+|   `mutate`      | crea nuevas variables con funciones de variables existentes |
+|   `summarise`   | resume los datos|
+|               |           |
+|   `groub_by`* 	|  agrupa bajo ciertas clasificaciones|
+
+## Los verbos
+
+Todos los verbos funcionan de una forma similar, en el sentido de que:
+
+\pause
+
+>- el primer argumento es un dataframe, 
+
+>- los argumentos siguientes describen _qué_ se va a hacer con el dataframe, usando las variables existentes (sin comillas).
+
+>- el resultado es un dataframe
+
+\pause
+
+Todo esto permite que se concatenen (`%>%`) operaciones sencillas para obtener resultados complejos.
+
+
+## `filter`
+\pause
+
+![Otro tipo de filtro](Instagram_filter.jpg)
+
+
+## `filter`
+
+Esta función es muy similar a lo que ya hicimos hace varias diapositivas, pues permite eliminar/conservar filas según un criterio (o más), pero utilizando menos palabras. \pause Por ejemplo, si queremos obtener las filas que corresponden a las personas aseguradas:
+
+```{r}
+filter(personas,Asegurado)
+```
+\pause
+
+Si se quiere guardar en un nuevo dataframe, se guarda como cualquier otro objeto
+
+```{r}
+asegurados_df <- personas %>% filter(Asegurado)
+```
+
+\pause
+
+Es equivalente usar cualquiera de las dos notaciones: con `%>%` o sin este.
+
+
+## `filter` 
+
+Si quisiéramos únicamente ver las personas con sexo femenino, hacemos:
+
+```{r,warning=FALSE}
+personas %>% filter(Sexo == 'F')
+```
+
+\pause
+Usando `filter`, encuentre las personas con edad mayor a 23. \pause Ahora, busque únicamente las personas que son de Limon. Tenga cuidado si usó tildes al definirlo.\pause
+
+```{r,eval = FALSE}
+personas %>% filter(Edad > 23)
+personas %>% filter(Provincia == 'Limon')
+```
+
+## Interacción del `filter`
+
+También se puede considerar una interacción entre las variables que se usan para definir un `filter`. Por ejemplo, si queremos las personas que comenzaron a trabajar con al menos 20 años (Edad - Antiguedad >=20) y que además no estén casados. Hacemos:
+
+\pause
+
+```{r}
+personas %>% filter(Edad - Antiguedad >= 20,Casado)
+```
+\pause
+
+También se pudo hacer:
+
+```{r}
+personas %>% filter((Edad - Antiguedad >= 20) & Casado)
+```
+
+\pause
+Repita el ejercicio anterior, pero ahora que las personas hayan comenzado a trabajar con al menos 20 años, **o** que estén casados.
+ 
+## `arrange` 
+
+Este verbo ordena según las columnas que se le indiquen: 
+
+```{r}
+personas %>% arrange(Edad)
+```
+
+## Ordena palabras
+
+También puede ordenar lexicográficamente:
+
+```{r}
+personas %>% arrange(Provincia)
+```
+
+\pause Note que sí podemos ordenar por characters y que en general podemos comparar dos strings `'A'> 'B'`\pause, pero no podemos intentar hacer restas o sumas entre strings: `'A' + 'B'`, tira un error.
+
+\pause
+Ordene a las personas por apellidos.
+
+## `arrange` descendiente
+
+Para que quede en orden descendiente, se llama la misma columna pero envuelta en `desc(...)`:
+
+```{r}
+personas %>% arrange(Provincia,desc(Edad))
+```
+
+También se puede ordenar con más de una columna, al ponerla como otros parámetros de la función. Siempre se le da prioridad a la primera columna que se indica, los empates los resuelve la segunda, los empates de la segunda los resuelve la tercera y así sucesivamente...
+
+## `arrange`, más complejo
+
+Se pueden hacer operaciones (un poco) más complejas con `arrange`:
+
+```{r}
+personas %>% arrange(abs(Edad - Antiguedad - 20))
+```
+
+¿Qué indica el orden anterior? \pause Lo anterior indica quienes son los que están más cercanos de haber comenzado a trabajar a los 20 años.
+
+\pause
+Ordene a las personas primero por su estado de asegurado, y luego por antiguedad. ¿Qué va primero? ¿True o False?  \pause Si se quisiera ordenar por sexo, ¿cuál va primero? Realice este orden, y luego por nombre. 
+
+
+## `select`
+
+Este verbo permite que uno _seleccione_ las variables con las que uno quiere trabajar. Algunas veces otras variables pueden incomodar o no ser necesarias. 
+
+```{r}
+personas %>% select(Nombre,Apellido,Edad)
+```
+\pause
+Es equivalente a usar:
+
+```{r,eval=FALSE}
+personas %>% `[`(c('Nombre','Apellido','Edad'))
+personas[c('Nombre','Apellido','Edad')]
+```
+
+Pero es bastante más cómodo de escribir.
+
+## Eliminar con `select`
+
+Para quitar columnas de un dataframe se puede usar el `-` (menos), para indicar que esa columna no:
+
+```{r}
+personas %>% select(-Edad,-Sexo,-Asegurado)
+```
+
+
+## `select`
+
+También se le pueden indicar _rangos_ de la forma `X:Y` para que tome todas las variables desde `X` hasta `Y`:
+```{r}
+personas %>% select(Provincia:Casado)
+```
+
+
+
+## Más funciones 
+
+Hay una serie de funciones diseñadas para complementar `select`, y poder trabajar con mayor facilidad. Entre estas están: 
+
+>- `starts_with('algo')` que busca las columnas que comienzan con `'algo'`
+
+>- `ends_with('mas')` que busca las columnas que terminan con `'mas'`
+
+>- `contains('otra')` que busca las columnas que contienen `'otra'` en su nombre
+
+>- `matches(...)` que busca las columnas que coincidan con la expresión regular(ver `?regexp`) que se indique.
+
+>- `num_range('x',1:15)` que busca las columnas que sean de la forma `x1`, `x2`,\dots,`x15`
+
+\pause
+
+Seleccione todas las columnas que terminen con `'ado'`, junto con el Nombre de la persona. \pause Seleccione las columnas que comienzan con `'a'`
+
+
+## Cambiar nombres
+
+Con select se pueden cambiar los nombres de las variables (columnas) que se están considerando:
+
+```{r}
+personas %>% select(Primer_Nombre = Nombre, Primer_Apellido = Apellido)
+```
+
+Pero tiene la desventaja de que se pierden las columnas que no se mencionen.
+
+## `rename`
+
+Esto se puede arreglar de dos formas: incluir `everything()` en el llamado a `select`: 
+
+```{r,eval=FALSE}
+personas %>% select(Primer_Nombre = Nombre, Primer_Apellido = Apellido,everything())
+```
+
+O, se puede usar la función `rename`:
+
+```{r}
+personas %>% rename(Primer_Nombre = Nombre, Primer_Apellido = Apellido)
+```
+
+\pause
+Cambie el nombre de la columna de `Sexo` a `Genero`. \pause
+
+
+## `mutate`
+
+\pause
+
+![Otro tipo de mutaciones](x-men-146820.jpg)
+
+
+## `mutate` 
+
+\pause
+
+Este verbo permite crear una nueva columna a partir de las ya existentes:
+
+```{r}
+personas %>% mutate(Nombre_Completo = paste(Nombre,Apellido))
+```
+
+
+## `mutate` 
+
+También se pueden realizar operaciones numéricas, 
+
+```{r}
+personas %>% 
+  mutate(Edad_Inicio = Edad - Antiguedad) %>% 
+  select(-Sexo,-Provincia) # para que quepa en la diapositiva
+```
+
+\pause
+
+Si los años que le faltan a las personas para pensionarse es la diferencia entre 65 y su edad actual, ¿cuánto les falta para pensionarse? \pause ¿Cuanta antiguedad van a tener los 65 años? ¿Es más que 40 años?
+
+
+## `mutate` 
+
+También se pueden agregar columnas completamente nuevas con `mutate`, pero hay que tener cuidado de que tengan el orden correcto (`arrange` podría ser útil)
+
+```{r}
+personas %>% 
+  mutate(Bachillerato_en = c('Farmacia','Nutrición','Actuariales','Economia'),
+         Hijos = c(FALSE,TRUE,FALSE,TRUE)) %>%
+  select(-(Edad:Antiguedad)) # tambien puedo eliminar columnas con rangos
+```
+
+\pause
+En general se pueden agregar varias nuevas columnas.
+
+## `mutate`
+
+Como en los demás verbos, se retorna un dataframe:
+
+```{r}
+personas_act <- personas %>% 
+  mutate(Bachillerato_en = c('Farmacia','Nutrición','Actuariales','Economia'),
+         Hijos = c(FALSE,TRUE,FALSE,TRUE)) %>%
+  mutate(Annos_pension = 65 - Edad,
+         Anno_pension_antiguedad =  Antiguedad + 65 - Edad)
+str(personas_act)
+```
+
+
+## `mutate` + `ifelse`
+
+Una combinación muy útil es emplear `mutate` junto con `ifelse`, para revisar condiciones y luego **mhm** _(se aclara la garganta)_ agrupar variables.
+
+```{r}
+personas %>% mutate(Clasificacion_edad = ifelse(Edad<20,1,
+                                                    ifelse(Edad>=25,3,2)))
+```
+
+## `summarise` 
+
+Resume la información con la función 'ventana' que se indique, de la forma que se indique.
+
+##  `group_by`
+
+Agrupa
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+
+##

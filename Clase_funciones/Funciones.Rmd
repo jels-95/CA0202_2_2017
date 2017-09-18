@@ -632,6 +632,52 @@ v1
 
 
 
+## while
+
+Algunas veces se quiere iterar hasta que se cumpla cierta condición, por lo que se tiene la función de _while_:
+
+```{r}
+a <- -15.3
+b <- 7
+while(a<b){
+  a <- a+2
+  b <- b+1
+}
+
+print(c(a,b)) # imprime el vector
+```
+
+Que si se quisiera incorporar dentro de una función se podría. \pause Y como en Java, hay que tener cuidado con los ciclos infinitos... Por ejemplo, si se pone en el while de arriba `b <- b+2`, se itera hasta el infinito.
+
+## switch
+
+Otra función bastante importante, y útil, es la función _switch_, que funciona como el select que vimos en **VBA**:
+
+```{r}
+switch(2,3,4)
+switch(7,'No','no','tampoco','puede','pasar',
+       'casi','Si!!','te pasaste','demasiado')
+```
+
+Solo que toma el numero de entrada que le corresponda. Pero también se le podrían poner nombres:
+
+```{r}
+switch('A',B = 'Valor B',A = 'Valor A',C = 'Valor C')
+```
+
+## Switch con funciones:
+
+Los switch, esperan devolvr un objeto, el cual puede ser una función, por lo que luego se puede operar sobre este:
+
+```{r}
+switch('X',X = mean,Y = sum,Z = max)(1:15)
+```
+
+\pause
+
+Si no se hubiera puesto el vector `1:15`, se obtiene la función que corresponde.\pause Haga el llamado pero sin el vector `1:15`. 
+
+
 ## Próximamente:
 
 
