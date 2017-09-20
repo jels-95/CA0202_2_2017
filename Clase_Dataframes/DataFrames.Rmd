@@ -320,20 +320,22 @@ También se puede considerar una interacción entre las variables que se usan pa
 \pause
 
 ```{r}
-personas %>% filter(Edad - Antiguedad >= 20,Casado)
+personas %>% filter(Edad - Antiguedad >= 20,!Casado)
 ```
 \pause
 
 También se pudo hacer:
 
-```{r}
-personas %>% filter((Edad - Antiguedad >= 20) & Casado)
+```{r,eval=FALSE}
+personas %>% filter((Edad - Antiguedad >= 20) & !Casado)
 ```
 
 \pause
 Repita el ejercicio anterior, pero ahora que las personas hayan comenzado a trabajar con al menos 20 años, **o** que estén casados.
- 
+
 ## `arrange` 
+
+\pause
 
 Este verbo ordena según las columnas que se le indiquen: 
 
@@ -367,6 +369,8 @@ También se puede ordenar con más de una columna, al ponerla como otros paráme
 ## `arrange`, más complejo
 
 Se pueden hacer operaciones (un poco) más complejas con `arrange`:
+
+\pause
 
 ```{r}
 personas %>% arrange(abs(Edad - Antiguedad - 20))
@@ -411,6 +415,21 @@ También se le pueden indicar _rangos_ de la forma `X:Y` para que tome todas las
 personas %>% select(Provincia:Casado)
 ```
 
+
+## Seleccionar por numero de columna
+
+Se pueden seleccionar columnas utilizando su posición en la tabla:
+
+```{r}
+personas %>% select(3:6)
+```
+
+Y se pueden combinar números con nombres:
+
+
+```{r}
+personas %>% select(2:4,Casado)
+```
 
 
 ## Más funciones 
@@ -530,33 +549,161 @@ personas %>% mutate(Clasificacion_edad = ifelse(Edad<20,1,
                                                     ifelse(Edad>=25,3,2)))
 ```
 
+
+## `mutate` + _otras funciones_ 
+
+También se pueden aplicar funciones vectoriales que retornen un único valor (sino, da problemas) para toda la tabla:
+
+```{r}
+personas %>% mutate(Media_edad = mean(Edad), 
+                    Max_antig = max(Antiguedad),
+                    Primer_Nombre = first(Nombre),
+                    Ultimo_Ap = last(Apellido),
+                    Cantidad = n()) %>%
+  select(-Sexo,-Provincia,-Casado)
+```
+
+## 
+
+Por este tipo de funciones es que arrange es _taaaaan_ útil. 
+
+\pause Usando `arrange` y `mutate` indique cuanto es la diferencia entre las personas con la edad menor. 
+
+\pause Combinando `filter` y `mutate` indique cuantas personas hay casadas.
+
+\pause Repita lo anterior, pero con la cantidad de personas que tienen sexo `'M'`
+
+
+
+## `transmute`
+
+Esta función hace lo mismo que `mutate`, con la excepción de que se quitan todas las columnas _viejas_:
+
+```{r}
+personas %>% 
+  transmute(Clasificacion_edad = ifelse(Edad<20,1,ifelse(Edad>=25,3,2)),
+            Dif_Antig = Antiguedad - first(Antiguedad),
+            Apellido,
+            Num_persona = row_number())
+```
+
+
+## Otras funciones:
+
+Todas las funciones que devuelvan un vector con la misma (o menor a) cantidad de entradas de las que reciban* se pueden aplicar usando un `mutate`. Entre estas, están la mayoria de las de funciones de utilidad de la primera presentación, y:
+\pause
+
+|	función	  |	resultado               |
+|------------:|-----------              |
+|    `lag`      | la entrada anterior     |
+|    `lead`     | la entrada siguiente    |
+| `cummean`     |	media acumulada         |
+| `cummin`  	  | minimo acumulado        |
+| `row_number`  | numero de fila          |
+| `ntile`       | agrupa en `n` cajas		| 
+
+
+
 ## `summarise` 
 
-Resume la información con la función 'ventana' que se indique, de la forma que se indique.
+\pause
+
+Resume la información con la función de resumen que se indique, como con mutate, de la forma que se indique.
+\pause
+
+```{r}
+personas %>% 
+  summarise(Total_personas = n(),
+            Max_edad = max(Edad),
+            Min_antig = min(Antiguedad))
+```
+
+\pause
+Note que solo se obtiene una fila y se pierden todas las demás.
+
+\pause
+
+Usando `filter`, `mutate` y `summarise` indique cuanto es lo máximo que se separan las edades de las antiguedades de los hombres casados.
+ 
+\pause
+Por sí sola, la función de `summarise` es útil, pero saca todo su potencial cuando se combina con:
 
 ##  `group_by`
 
-Agrupa
+\pause
 
 ```{r}
-
+personas %>%
+  group_by(Sexo) %>%
+  summarise(Total_por_sexo = n())
 ```
+
+Basándose en esto, ¿qué cree que hace `group_by`?
+
+\pause
+
+Lo que hace `group_by` es crear "grupos" de tablas diferenciando por los posibles tipos de valores que toman los parámetros que se le indiquen, para que las operaciones siguientes que realice las haga como si fueran tablas separadas. Para _desagrupar_ una tabla que está agrupada, se usa la función `ungroup`.
+
+
+## `group_by` + `mutate`
+
+Al combinar `group_by` con `mutate`, se crea una columna nueva (como con mutate normal), pero sin perder las observaciones anteriore, como sí pasa con `summarise`:
+
+\pause
 
 ```{r}
-
+personas %>% 
+  group_by(Sexo) %>%
+  mutate(Total_sexo = n()) %>%
+  ungroup()
 ```
+
+\pause
+
+Esto después se podría combinar con otro conteo más complejo, para estimar el porcentaje de personas que están en cada categoría. Y ya se tiene el porcentaje al que le corresponde cada persona.
+
+\pause
+Repita el ejercicio anterior, pero con `Provincia`.
+
+## Más de un grupo
+
+Si se quiere agrupar con más de una columna, lo que se hace es que se incluye en los parámetros de `group_by`:
 
 ```{r}
-
+personas %>%
+  group_by(Sexo,Casado) %>%
+  summarise(Max_antig  = )
 ```
+
+
+
+\pause
+¿Qué provincia tiene más personas aseguradas? Recuerde que `TRUE == 1` y que `FALSE == 0`. \pause ¿Cual condición de aseguramiento tiene la mayor diversidad de provincias? Puede apoyarse en la función `n_distinct`.
+
+
+## `group_by` + `filter`
+
+
+Si se quisieran conservar los grupos que tengan al menos cierta cantidad de observaciones, se puede hacer:
 
 ```{r}
-
+personas %>%
+  group_by(Provincia) %>%
+  filter(n()>1) %>% 
+  ungroup()
 ```
 
-```{r}
+\pause
+Repita el ejercicio, pero conservando las provincias que tengan como edad mínima al menos 24.
 
-```
+
+## `rowwise`
+
+Esta función permite aplicar funciones fila por fila, sin tener interacción entre filas. Es particularmente útil cuando se trabaja con funciones propias, las cuales resumen la información que se está trabajando, pero se van a tener resultados distintos para cada fila.
 
 
-##
+
+## Proximamente:
+
+
+x_joins :)
