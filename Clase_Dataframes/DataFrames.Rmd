@@ -8,7 +8,7 @@ classoption: aspectratio=169
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(ggplot2)
+#library(ggplot2)
 ```
 
 ## Creando el primero
@@ -648,21 +648,18 @@ Lo que hace `group_by` es crear "grupos" de tablas diferenciando por los posible
 ## `group_by` + `mutate`
 
 Al combinar `group_by` con `mutate`, se crea una columna nueva (como con mutate normal), pero sin perder las observaciones anteriore, como sí pasa con `summarise`:
-
 \pause
 
 ```{r}
 personas %>% 
-  group_by(Sexo) %>%
-  mutate(Total_sexo = n()) %>%
-  ungroup()
+  group_by(Sexo) %>% mutate(Total_sexo = n()) %>%
+  ungroup() %>% select(-(Provincia:Antiguedad))
 ```
 
-\pause
+## 
 
 Esto después se podría combinar con otro conteo más complejo, para estimar el porcentaje de personas que están en cada categoría. Y ya se tiene el porcentaje al que le corresponde cada persona.
 
-\pause
 Repita el ejercicio anterior, pero con `Provincia`.
 
 ## Más de un grupo
@@ -672,17 +669,14 @@ Si se quiere agrupar con más de una columna, lo que se hace es que se incluye e
 ```{r}
 personas %>%
   group_by(Sexo,Casado) %>%
-  summarise(Max_antig  = )
+  summarise(Max_antig  = max(Antiguedad))
 ```
 
-
-
 \pause
-¿Qué provincia tiene más personas aseguradas? Recuerde que `TRUE == 1` y que `FALSE == 0`. \pause ¿Cual condición de aseguramiento tiene la mayor diversidad de provincias? Puede apoyarse en la función `n_distinct`.
+¿Qué provincia tiene más personas aseguradas? Recuerde que `TRUE == 1`. \pause ¿Cual condición de aseguramiento tiene la mayor diversidad de provincias? Use: `n_distinct`.
 
 
 ## `group_by` + `filter`
-
 
 Si se quisieran conservar los grupos que tengan al menos cierta cantidad de observaciones, se puede hacer:
 
