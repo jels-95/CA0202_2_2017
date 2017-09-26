@@ -628,6 +628,12 @@ Usando `filter`, `mutate` y `summarise` indique cuanto es lo máximo que se sepa
 \pause
 Por sí sola, la función de `summarise` es útil, pero saca todo su potencial cuando se combina con:
 
+
+##  `group_by`
+\pause
+
+![Otro tipo de grupos](Definicion_de_grupos.jpg){width=75%}
+
 ##  `group_by`
 
 \pause
