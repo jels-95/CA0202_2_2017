@@ -1,0 +1,323 @@
+---
+title: "Unir tablas"
+author: "Jorge Loría"
+date: "Sept 25, 2017"
+output: beamer_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Unir tablas
+
+Hay varias formas de hacer uniones de tablas. Este tipo de uniones se pueden dar cuando se tienen datos que mantienen ciertas tipos de relaciones en distintas tablas.
+
+## Datos
+
+Vamos a ocupar las siguientes tablas para hacer los ejemplos de esta clase:
+
+```{r,warning=FALSE,message=FALSE}
+library(dplyr)
+x1 <- data.frame(nombre = c('a','b','c','a'),
+                 valor_x = c('x1','x2','x3','x4'),
+                 stringsAsFactors = FALSE)
+y1 <- data.frame(nombre = c('a','b','d','b'),
+                 valor_y = c('y1','y2','y3','y5'),
+                 stringsAsFactors = FALSE)
+```
+
+
+
+## Más datos
+
+```{r}
+y2 <- y1 %>% 
+  rename('Otro_nombre' = 'nombre')
+
+x2 <- data.frame(Otro_nombre = c('a','b','c','a'),
+                 Otro_valor_x = c('x1','x2','x3','x2'),
+                 nuevo_valor = c(15.7,7.46,6.19,8.80),
+                 stringsAsFactors = FALSE)
+
+y3 <- data.frame(nombre = c('a', 'b','d','a'),
+                 valor_y = c('3y1','3y2','3y3','3y4'),
+                 stringsAsFactors = FALSE)
+```
+
+
+## `*_join`
+
+Hay 6 tipos de `join`, los cuales se parecen mucho entre sí. La gran diferencia es a *cual* de las tablas se le va a dar prioridad para conservar observaciones. Lo que se busca hacer con los `join` es obtener información que se tiene en otra tabla para poder realizar operaciones con variables de ambas tablas.
+
+\pause
+
+|	`*_join`  | Prioridad	                          |
+|----------:|-------------------------------------|
+|  left     |  primer argumento                   |
+|  right    |  segundo argumento                  |
+|  full     |  ambos argumentos                   |
+|  inner    |  ambas con coincidencias            |
+|  semi     |  primer argumento con coincidencias |
+|  anti     |  primer argumento sin coincidencias |
+
+
+\pause
+
+Los primeros cuatro son para aumentar la cantidad de variables (como `mutate`). Los otros dos, son para eliminar observaciones (como `filter`). 
+
+## `left_join`
+
+Esta función busca en las columnas del primer argumento (`x1`) que se indiquen (con el parámetro `by = 'nombre'`) cuales observaciones tienen coincidencias en la segunda tabla (`y1`) en la misma columna.
+
+
+\pause
+```{r}
+left_join(x1,y1,by = 'nombre')
+```
+
+
+
+## `NA`
+\pause
+
+En general, muchas veces **no** hay datos para todas las observaciones, por lo que se puede poner `NA` para estos casos. Que representa "not available", o sea: "no disponible". \pause Dependiendo de las circunstancias y la naturaleza de los datos estos se pueden tratar de varias formas, muchas de las funciones base tiene el parámetro `na.rm` que viene pre definido como `FALSE`, si se le llama con `na.rm = FALSE` se omite ese valor a la hora de realizar el llamado. \pause Los valores `NA` pueden estar en cualquier clase de vectores: lógicos, enteros, numéricos y caracteres.  \pause En general las funciones al recibir un `NA` van a devolver un `NA`, incluso las comparaciones: `NA == 1`, `NA == TRUE`, `NA == 'Hola'` y `NA == NA`. \pause Para este último caso, existe una función que se llama `is.na` que indica si el valor es `NA` o no, y se puede combiar con `ifelse` para hacer cambios sobre estos.
+
+\pause
+
+Calcule la media del vector `seq(-120,30,by = 15)/(2*(-8:2))`, primero usando `na.rm = TRUE` y luego usando `na.rm = FALSE`.
+
+
+## `right_join`
+
+
+Esta función es similar al `left_join` solo que conserva los valores del **segundo** argumento (cuando se lee es el de la derecha):
+
+\pause
+```{r}
+right_join(x1,y1,by = 'nombre')
+```
+
+## `full_join`
+\pause
+
+Conserva **todas** las filas posibles de ambos argumentos, independientemente de si tienen un valor en el otro lado:
+\pause
+
+```{r}
+full_join(x1,y1,by = 'nombre')
+```
+
+
+
+
+
+## `inner_join`
+\pause
+
+Conserva todas las observaciones que están en ambas tamblas:
+
+\pause
+```{r}
+inner_join(x1,y1,by = 'nombre')
+```
+
+\pause
+Con esta se tiene certeza de que no se van a tener `NA` nuevos por el `join`. \pause ¿Porqué? \pause Si quisiera replicar un `inner_join` usando un `full_join` y varios filter, ¿cómo lo haría? \pause ¿Podría hacer lo mismo con un `right_join` o un `left_join`?
+
+## `semi_join`
+
+\pause
+
+Conserva todas las observaciones del primer argumento que tienen al menos una coincidencia en el segundo argumento.
+
+```{r}
+semi_join(x1,y1,by = 'nombre')
+```
+
+
+\pause
+Con esta se tiene la misma garantía que la que se tiene con el `inner_join`. \pause ¿Porqué? \pause ¿Como podría hacer lo mismo pero usando otro tipo de  `join`?  
+
+## `anti_join`
+
+\pause
+
+Esta quita todas las observaciones del primer argumento que tienen un valor correspondiente en el segundo argumento:
+
+```{r}
+anti_join(x1,y1,by = 'nombre')
+```
+
+\pause
+¿Se obtiene un resultado distinto si se llama como primer argumento `y1` y de segundo argumento `x1`? \pause
+
+¿Qué se obtiene al llamar con el mismo dataframe en ambos argumentos? \pause
+
+¿Se puede garantizar lo mismo que con los `join` anteriores? \pause
+
+¿Como puede replicar este `join` usando otros tipos de `*_join`?
+
+
+
+<!------------
+## `by = `
+
+Muchas veces se tiene más de un criterio sobre el que se quiere unir. Por ejemplo si se tienen datos como los de la lección anterior que indican para cada año, mes y persona, cuánto fue que ganó (y otras características de la persona). Si tuviéramos otra tabla como esta, pero indicando los gastos para cada mes, haríamos:
+
+
+```{r,eval=FALSE}
+full_join(datosSalario,
+          datosGastos,
+          by = c('Nombre','Anno','Mes'))
+```
+
+\pause
+
+¿Porqué usamos un `full_join` y no un `left_join` o un `right_join`? 
+--------->
+
+## `by = `
+
+\pause
+
+Si las tablas que se están usando tienen nombres de columnas distintas, se puede usar un vector con nombres como parámetro para realizar el `*_join`, y se conservan los nombres del primer `data.frame`: \pause
+
+```{r}
+x1 %>% 
+  left_join(y2, by = c('nombre' = 'Otro_nombre'))
+```
+
+\pause
+¿Cómo queda el llamado anterior si se quiere poner de primer argumento `y2`?
+
+## `by = `
+
+\pause
+
+Se pueden indicar más columnas usando vectores de mayor longitud:
+
+\pause
+
+```{r}
+x1 %>% 
+  mutate(Mi_valor = row_number()) %>%
+  full_join(x2,by = c('nombre' = 'Otro_nombre',
+                      'valor_x' = 'Otro_valor_x'))
+```
+
+\pause
+
+Haga lo anterior (incluyendo el `mutate`) pero usando un `left_join`. \pause Repita el ejercicio pero con un `right_join`.
+
+## `by = `
+
+\pause
+
+Si los nombres por los que se va a unir son idénticos y son las únicas columnas que cumplen esto, se puede omitir el parámetro `by`, pero se imprime en consola una línea de aviso de cuales columnas se están usando:
+
+\pause
+```{r}
+x1 %>% full_join(y1)
+```
+
+
+## Valores duplicados
+
+\pause
+Hasta el momento a cada una de las llaves le corresponde una única observación en al menos una de las tablas por las que se realiza la unión. En caso de que ambas tablas presenten valores duplicados, se hacen todas las posibles combinaciones (i.e. producto cartesiano) entre las coincidencias que se encuentren:
+\pause
+
+```{r}
+x1 %>% left_join(y3, by = c('nombre'))
+```
+
+\pause
+
+Note que ahora se obtienen 4 observaciones con `nombre = 'a'`.
+
+## `bind_*`
+
+Estas funciones unen (pegan) data.frames en un sentido más literal que el que se usa para el join. Hay dos funciones de `bind_*`: `bind_cols` que pega **columnas** nuevas, y `bind_rows` que pega **filas** nuevas:
+
+\pause
+
+```{r}
+bind_cols(x1,x2)
+```
+
+\pause
+Si los argumentos no coinciden en la cantidad de columnas, se obtiene un error. \pause Obtenga ese error usando:
+
+```{r,eval=FALSE}
+x2 %>% 
+  filter(nuevo_valor < 10 ) %>% 
+  bind_cols(x1)
+```
+
+## `bind_rows`
+
+Para esto, se ocupa que los dataframes que se pasan como argumento tengan los mismos nombres de columnas:
+\pause
+
+```{r}
+y1 %>% bind_rows(y3)
+```
+
+
+
+## `bind_rows`
+
+En caso de que no, toma todas las columnas de los dataframes que se le pasen, y une en las que coinciden:
+
+\pause
+```{r}
+x1 %>% bind_rows(y3)
+```
+
+
+## Nota sobre `bind_*`
+\pause
+
+Por ahora solo hemos usado dos argumentos para realizar los `bind`, sin embargo, pueden recibir tantos argumentos como se quiera:
+
+\pause
+
+```{r}
+x1 %>% bind_cols(x2,y1,y2,y3)
+```
+
+## `expand.grid`
+
+Algunas veces hay que completar _a pata_ los datos que se tienen, o se quieren obtener todas las posibles combinaciones entre varios vectores. Para este tipo de tareas, existe la función `expand.grid`:
+
+\pause
+```{r}
+expand.grid(Anno = 2017:2018,Mes = 1:3)
+```
+
+En general, pueden ponerse tantos vectores como se quieran.
+
+## Ejercicio
+
+Complete la tabla de salarios que se usó la clase anterior, puede apoyarse en las funciones `expand.grid`, `bind_*`, y `unique` para obtener todos los nombres de la tabla.
+
+\pause
+
+Termine los ejercicios que se trabajaron el lunes, si ve la oportunidad de usar lo que vimos en la clase de hoy, hágalo.
+
+\pause
+
+`bind_rows`
+
+
+## Próximamente:
+
+
+tidyr :)
+
+
+
+
+
+
