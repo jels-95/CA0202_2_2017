@@ -1,0 +1,116 @@
+---
+title: "Ordenar dataframes"
+author: "Jorge Loría"
+date: "Sept 28, 2017"
+output: beamer_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Datos Ordenados
+
+\pause
+
+> Todas las familias felices se parecen, todas las familias infelices son infelices a su manera 
+- Leo Tolstoy (parafraseado)
+
+\pause
+
+> Todos los conjuntos de datos ordenados se parecen, todos los conjuntos de datos desordenados son desordenados a su manera
+- Hadley Wickham
+
+
+## Ordenar dataframes
+
+<!----Pero no para llevar------->
+
+
+Para ordenar conjuntos
+
+
+## Principios de los datos ordenados
+
+\pause
+
+Los datos ordenados siguen "3" principios básicos:
+
+>- A cada variable le corresponde una columna
+
+>- A cada observación le corresponde una fila
+
+>- A cada unidad de observación le corresponde un data.frame
+
+\pause
+
+Corolario de las primeras dos:
+
+>- A cada valor le corresponde una única celda
+
+\pause
+A pesar de que estas definiciones son bastante intuitivas y todos los datos que hemos manejado en el curso han sido _ordenados_, muchas veces se presentan desórdenes en los datos crudos.
+
+## Desórdenes _más_ usuales
+
+>- Los nombres de las columnas son valores, no nombres de variables
+
+>- Varios valores están guardados en una misma columna
+
+>- Hay variables que se guardan tanto en filas como en columnas
+
+>- Varias unidades de observación están en la misma tabla
+
+>- Una unidad de observación está guardada en varias tablas
+
+## Funciones para ordenar:
+
+Hay 4 funciones base para ordenar un dataframe, vienen en el paquete `tidyr`. \pause Cargue este paquete usando la función `library`. \pause Estas funciones son:
+
+|	función | Operación	|
+|----------:|-----------|
+|  spread   |  pasa filas actuales a columnas	|
+|  gather   |  pasa columnas a filas |
+|  separate |  separa filas	|
+|  unite    |  une filas	|
+|  complete |  completa los datos |
+
+
+## `spread`
+
+\pause
+
+![Otro tipo de spread](Spread_Butter.jpg)
+
+## `spread` 
+
+Esta función permite pasar de varias columnas que contienen un identificador en su nombre a columnas nuevas con una columna que le corresponda a los valores de los nombres de las columnas, y otro para los valores que toman en esas columnas.
+
+
+
+## `gather` 
+
+
+
+
+
+
+
+## `separate` 
+
+
+
+
+
+## `unite` 
+
+
+
+
+
+
+## `complete` 
+
+
+
