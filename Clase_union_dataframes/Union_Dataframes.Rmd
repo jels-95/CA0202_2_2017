@@ -11,9 +11,16 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Unir tablas
 
-Hay varias formas de hacer uniones de tablas. Este tipo de uniones se pueden dar cuando se tienen datos que mantienen ciertas tipos de relaciones en distintas tablas.
+Pocas veces se tiene la suerte de tener todos los datos en una misma tabla, o que únicamente se ocupan los datos de una sola tabla.
 
-## Datos
+\pause
+Es por esto, que muchas veces se tienen que **unir** dataframes. \pause El método de unión va a depender  tanto de los datos de los que se dispone, como la organización que se les de. \pause Por el momento vamos a asumir que vienen acomodados de una forma ___linda___, que luego definiremos.
+
+\pause
+
+Vamos a ver varios métodos para unión de tablas.
+
+## Datos de ejemplo
 
 Vamos a ocupar las siguientes tablas para hacer los ejemplos de esta clase:
 
@@ -276,6 +283,19 @@ x1 %>% bind_rows(y3)
 ```
 
 
+
+## `bind_rows`
+
+Se puede incluir el parámetro `.id` para identificar a cual tabla pertenecen las filas que se obtienen:
+
+```{r}
+y1 %>% bind_rows(y3,.id = 'id')
+```
+
+
+
+
+
 ## Nota sobre `bind_*`
 \pause
 
@@ -293,10 +313,25 @@ Algunas veces hay que completar _a pata_ los datos que se tienen, o se quieren o
 
 \pause
 ```{r}
-expand.grid(Anno = 2017:2018,Mes = 1:3)
+expand.grid(Anno = 2017:2018,
+            Nombre = c('Pablo','Ana'))
 ```
 
 En general, pueden ponerse tantos vectores como se quieran.
+
+
+
+## `expand.grid`
+
+Como el nombre se obtiene como un factor, se puede usar el parámetro `stringsAsFactors`, para obtenerlos como strings.
+
+```{r}
+expand.grid(Anno = 2017:2018,Mes = 1:3,
+            Nombre = c('Pablo','Ana'),stringsAsFactors = FALSE)
+```
+
+
+
 
 ## Ejercicio
 
