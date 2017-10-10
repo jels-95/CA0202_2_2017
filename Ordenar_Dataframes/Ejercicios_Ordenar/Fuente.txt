@@ -1,0 +1,13 @@
+Life_tables_world.csv,
+Tomado de:
+
+http://apps.who.int/gho/data/node.main.LIFECOUNTRY?lang=en
+
+Population_growth.csv
+Tomado de:
+https://data.worldbank.org/indicator/SP.POP.GROW
+
+
+Tasa_Basica_pasiva.xlsx
+Tomado de:
+http://indicadoreseconomicos.bccr.fi.cr/indicadoreseconomicos/Cuadros/frmVerCatCuadro.aspx?idioma=1&CodCuadro=%2017

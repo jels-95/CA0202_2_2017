@@ -7,35 +7,102 @@ output: beamer_presentation
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyr)
+library(dplyr)
+options(tibble.print_max = 5, tibble.print_min = 4)
+# options(tibble.width = 8,tibb) 
 ```
 
 
-## Datos Ordenados
+## Datos Ejemplo
+
+Los datos que vamos a usar se obtienen de la librería `datasets`, pero para ejemplificar vamos a usar el archivo `Datos_dataframes.RData`. \pause Para cargarlo solo deben pedirle a la computadora que lo abra con `RStudio`. \pause En estos dataframes se ve como los mismos datos se pueden representar de diversas formas. \pause
+
+Los datos que vamos a usar indican, para cada año y cada acción cuantas veces crecen en el año y el crecimiento porcentual que experimenta en ese año.
+
+\pause
+Para cargar los datos, se usa el comando `load`, indicando la dirección del archivo:
+
+```{r}
+load(file = 'Datos_dataframes.RData')
+```
+
+
+## `datos1`
+
+```{r}
+datos1
+```
+
+
+## `datos2`
+
+```{r}
+datos2
+```
+
+
+## `datos3`
+
+```{r}
+datos3
+```
+
+
+
+
+## `datos4a`
+
+Veces 
+```{r}
+datos4a
+```
+
+## `datos4b`
+
+Porcentual
+
+```{r}
+datos4b
+```
+
+
+## `datos5`
+
+
+```{r}
+datos5
+```
+
+
+
+
+## Datos Organizados ( _tidy_)
 
 \pause
 
-> Todas las familias felices se parecen, todas las familias infelices son infelices a su manera 
+> Todas las familias felices se parecen, cada familia infeliz es infeliz a su manera 
 - Leo Tolstoy (parafraseado)
 
 \pause
 
-> Todos los conjuntos de datos ordenados se parecen, todos los conjuntos de datos desordenados son desordenados a su manera
+> Tidy datasets are all alike, but every messy dataset is messy in its own way
 - Hadley Wickham
 
+<!-----------
+## Organizar dataframes
 
-## Ordenar dataframes
-
-<!----Pero no para llevar------->
-
-
+<!----Pero no para llevar
 Para ordenar conjuntos
+----->
 
 
-## Principios de los datos ordenados
+## Principios de los datos organizados
 
 \pause
 
-Los datos ordenados siguen "3" principios básicos:
+Los datos organizados siguen "3" principios básicos:
 
 >- A cada variable le corresponde una columna
 
@@ -49,10 +116,9 @@ Corolario de las primeras dos:
 
 >- A cada valor le corresponde una única celda
 
-\pause
-A pesar de que estas definiciones son bastante intuitivas y todos los datos que hemos manejado en el curso han sido _ordenados_, muchas veces se presentan desórdenes en los datos crudos.
+A pesar de que estas definiciones son bastante intuitivas y todos los datos que hemos manejado en el curso han sido _tidy_, muchas veces se presentan un poco desestructurads en su forma cruda.
 
-## Desórdenes _más_ usuales
+## Desorganizaciones _más_ usuales
 
 >- Los nombres de las columnas son valores, no nombres de variables
 
@@ -64,18 +130,20 @@ A pesar de que estas definiciones son bastante intuitivas y todos los datos que 
 
 >- Una unidad de observación está guardada en varias tablas
 
-## Funciones para ordenar:
+## Funciones para organizar:
 
-Hay 4 funciones base para ordenar un dataframe, vienen en el paquete `tidyr`. \pause Cargue este paquete usando la función `library`. \pause Estas funciones son:
+Hay 6 funciones base para organizar un dataframe, vienen en el paquete `tidyr`. \pause Cargue este paquete usando la función `library`. \pause Estas funciones son:
 
-|	función | Operación	|
-|----------:|-----------|
-|  spread   |  pasa filas actuales a columnas	|
-|  gather   |  pasa columnas a filas |
-|  separate |  separa filas	|
-|  unite    |  une filas	|
-|  complete |  completa los datos |
+|	función     | Operación	                      |
+|------------:|---------------------------------|
+|  `spread`   |  pasa filas actuales a columnas	|
+|  `gather`   |  pasa columnas a filas          |
+|  `separate` |  separa filas	                  |
+|  `unite`    |  une filas	                    |
+|  `complete` |  completa los datos             |
+|  `fill`     |  llena los datos                |
 
+Las primeras 4 son para modificar la _organización_ de los dataframes, y las otras dos son para lidiar con datos faltantes.
 
 ## `spread`
 
@@ -85,32 +153,217 @@ Hay 4 funciones base para ordenar un dataframe, vienen en el paquete `tidyr`. \p
 
 ## `spread` 
 
-Esta función permite pasar de varias columnas que contienen un identificador en su nombre a columnas nuevas con una columna que le corresponda a los valores de los nombres de las columnas, y otro para los valores que toman en esas columnas.
+\pause
+
+Esta función recibe un dataframe, y el nombre de dos de sus columnas. Una que va a ser la llave (`key`), que son los valores que van a tomar las columnas del nuevo dataframe, y el valor (`value`) que van a tomar estas columnas nuevas.
+
+```{r}
+datos2 %>% 
+  spread(key = tipo,value = Valor)
+```
 
 
 
 ## `gather` 
 
+\pause
 
+Esta función es en cierto sentido _inversa_ a `spread`, porque pasa de varias columnas a dos. Pero debe recibir **tres** parámetros: los nombres de las columnas **nuevas** que se van a crear (una que indica la llave (`key`) y la otra que indica el valor (`value`)) y los nombres actuales que toman esas columnas usando la misma sintaxis que se usa para `select` de `dplyr`:
 
+\pause
 
+```{r}
+datos4a %>% 
+  gather(key = Anno,value = Veces,`1991`:`1998`)
+```
 
+## `gather`
+
+\pause
+
+```{r}
+datos4b %>% 
+  gather(key = Anno,value = Porcentaje,
+         `1991`,`1992`:`1998`)
+```
+
+\pause
+
+¿Qué función se puede usar para _unir_ las dos tablas anteriores para formar `datos1`? \pause Hágalo.
+
+## `separate` 
+
+\pause
+
+![Pero no para reciclar](separate_recyclables.jpg)
 
 
 ## `separate` 
 
+Esta función recibe el nombre de la columna a separar (`col`), un _vector_ (`into`) de strings en que se va a separar la columna, y un parámetro (`sep`) para indicar con qué criterio se va a separar. <!----Este último puede ser una expresión regular (ver `regexp`), o las posiciones en donde se debe separar. Además, tiene un parámetro opcional (`convert`) para que intente realizar conversiones en los valores obtenidos --->
+\pause
 
+```{r}
+datos3 %>% 
+  separate(col = Veces_Porcentual,convert = TRUE,
+           into = c('Veces','Porcentual'),sep = '/')
+```
 
-
+¿Qué pasa si se llama sin `convert`? \pause ¿Si lo llama con `sep = '-'`?
 
 ## `unite` 
+\pause
 
+Esta función recibe tres argumentos: `col` una columna (la nueva), las columnas que se van a unir (como en `select`), y `sep` que indica con qué character se van a separar los valores.
 
+```{r}
+datos5 %>% 
+  unite(col = Anno_nuevo,Siglo,Anno,sep = '')
+```
 
+\pause
+Hay un parámetro opcional que se llama `remove`, ¿como cambia al usarlo con ` = TRUE`? \pause Cambie el orden de `Siglo` y `Anno`, ¿hay diferencia?
 
+## Datos faltantes
+
+Hay dos formas en que se pueden tener datos faltantes:
+\pause
+
+>- Explícitos: por lo general a través de un `NA`
+
+>- Implícitos: no están presentes
+
+\pause
+En general, se puede identificar qué tipo son, sabiendo que: _explícitos son evidencia de ausencia, e implícitos son ausencia de evidencia_
+
+\pause
+¿Adónde nos topamos valores explícitos faltantes? ¿Y los implícitos?
+
+## Datos nuevos
+
+\pause
+
+Para esta parte, vamos a usar los `datosSalario` nuevos, que vienen en `Datos_Salarios.RData`:
+```{r}
+load(file = 'Datos_Salarios.RData')
+datosSalario %>% arrange(Nombre)
+```
 
 
 ## `complete` 
+
+\pause
+
+![Pero no como el cereal](Komplete_Cereales.png){width=80%}
+
+## `complete` 
+\pause
+
+Obtiene todas las combinaciones que se puedan de las columnas que se le indiquen:
+
+```{r}
+completos <- datosSalario %>% complete(Nombre,Anno,Mes)
+completos
+```
+
+
+Con lo que se hacen explícitos los valores que se tenían antes como implícitos.
+
+
+## `fill`
+\pause
+
+Llena los valores faltantes (explícitos!) de las columnas que se indiquen con el valor anterior o siguiente (con el parámetro `.direction`).
+\pause
+
+```{r}
+completos %>% fill(Genero,.direction = c('up'))
+```
+
+\pause
+Usando `fill`, `mutate` y `group_by` llene el salario de cada observación faltante con el promedio de los meses anterior y siguiente. 
+
+
+## Solución
+
+```{r,warning=FALSE,eval=FALSE}
+completos %>% 
+  mutate(Salario_Ant = Salario,
+         Salario_Sig = Salario) %>% 
+  group_by(Nombre) %>% 
+  arrange(Anno,Mes) %>% 
+  fill(Salario_Sig, .direction = 'up') %>% 
+  fill(Salario_Ant, .direction = 'down') %>% 
+  mutate(Salario_Sig = ifelse(is.na(Salario_Sig),0,
+                              Salario_Sig),
+         Salario_Ant = ifelse(is.na(Salario_Ant),0,
+                              Salario_Ant)) %>% 
+  rowwise() %>% 
+  mutate(Salario = (Salario_Ant + Salario_Sig)/2) %>% 
+  ungroup()
+```
+
+## Solución
+
+```{r,warning=FALSE,eval=TRUE,echo=FALSE}
+options(tibble.print_max = 25,tibble.print_min = 12)
+completos %>% 
+  mutate(Salario_Ant = Salario,
+         Salario_Sig = Salario) %>% 
+  group_by(Nombre) %>% 
+  arrange(Anno,Mes) %>% 
+  fill(Salario_Sig, .direction = 'up') %>% 
+  fill(Salario_Ant, .direction = 'down') %>% 
+  mutate(Salario_Sig = ifelse(is.na(Salario_Sig),0,
+                              Salario_Sig),
+         Salario_Ant = ifelse(is.na(Salario_Ant),0,
+                              Salario_Ant)) %>% 
+  rowwise() %>% 
+  mutate(Salario = (Salario_Ant + Salario_Sig)/2) %>% 
+  ungroup()
+```
+
+## Próximamente:
+
+`ggplot2` :)
+
+
+```{r,include=FALSE}
+library(ggplot2)
+```
+
+\pause
+
+```{r,echo=FALSE,warning=FALSE,message=FALSE}
+completos %>% 
+  mutate(Salario_Ant = Salario,
+         Salario_Sig = Salario) %>% 
+  group_by(Nombre) %>% 
+  arrange(Anno,Mes) %>% 
+  fill(Salario_Sig, .direction = 'up') %>% 
+  fill(Salario_Ant, .direction = 'down') %>% 
+  rowwise() %>% 
+  mutate(Salario = ifelse(is.na(Salario),
+                          (Salario_Ant + Salario_Sig)/2,
+                          Salario)) %>% 
+  ungroup() %>% 
+  # mutate(Anno_Mes = zoo::yearmon(Anno + (Mes-1)/12)) %>% 
+  filter(Anno == 2017) %>% 
+  mutate(Nombre = as.factor(Nombre)) %>% 
+  ggplot(aes(x = Mes,y = Salario,color = Nombre)) +
+  geom_line(size = 1) +
+  theme_bw() +
+  labs(x = 'Meses',
+       y = 'Salario',
+       title = 'Salarios, por persona',
+       subtitle = 'en colones, para el 2017')
+```
+
+
+
+## Ejercicio
+
+A partir de la tabla `datos1`, obtenga las tablas `datos2`, `datos3`, `datos4a`, `datos4b` y `datos5`.
 
 
 
