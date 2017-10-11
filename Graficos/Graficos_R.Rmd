@@ -1,0 +1,733 @@
+---
+title: "Graficar"
+author: "Jorge Loría"
+date: "Oct 11, 2017"
+output: 
+  beamer_presentation:
+    fig_width: 6
+    fig_height: 4
+
+classoption: aspectratio=169
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+library(readr)
+```
+
+## Base
+
+Cargue los datos que se le entregaron, con el comando correspondiente.
+
+```{r,message=FALSE,error=FALSE}
+load('Datos_Credito.RData')
+```
+
+Para esta clase vamos a ocupar dos librerías:
+
+>- `dplyr`
+
+>- `ggplot2`
+
+
+## Estructura de estos datos
+
+
+Vamos a usar el dataframe que se indicó anteriormente, el cual tiene las siguientes columnas:
+
+```{r,eval=FALSE}
+str(creditcardmarketing_bbm)
+```
+
+
+```{r,echo=FALSE}
+head(creditcardmarketing_bbm,18000) %>% str
+```
+
+## Descripción de las variables
+
+
+```{r}
+names(creditcardmarketing_bbm)
+```
+
+
+## Primer gráfico
+
+Para describir una variable categórica se puede usar un gráfico de barras, estos le dan una altura correspondiente a la cantidad de observaciones que se observen en cada categoría
+
+\pause
+
+```{r,eval = FALSE,fig.align='center'}
+ggplot(data = creditcardmarketing_bbm) +
+  geom_bar(mapping = aes(x = Acepta_oferta))
+```
+
+
+## Primer gráfico
+
+```{r,echo = FALSE,fig.align='center'}
+ggplot(data = creditcardmarketing_bbm) +
+  geom_bar(mapping = aes(x = Acepta_oferta))
+```
+
+
+## Segundo gráfico
+
+Repita el gráfico anterior, pero usando la variable `Num_cuentas`
+\pause
+
+```{r,echo = FALSE,fig.align='center'}
+ggplot(data = creditcardmarketing_bbm) +
+  geom_bar(mapping = aes(x = Num_cuentas))
+```
+
+## Una variable continua
+
+Para describir una variable continua se usan los histogramas, los cuales hacen "cajitas" de cierto ancho, y dependiendo de cuantas observaciones se encuentren en cada cajita se le asigna esa altura.
+
+```{r,fig.align='center',eval=FALSE}
+ggplot(data = creditcardmarketing_bbm) + 
+  geom_histogram(mapping = aes(x=Balance_promedio),na.rm=T)
+```
+
+## Una variable continua
+
+```{r,fig.align='center',echo=FALSE}
+ggplot(data = creditcardmarketing_bbm) + 
+  geom_histogram(mapping = aes(x=Balance_promedio),na.rm=T)
+```
+
+## Una variable continua, 2
+
+Repita el gráfico anterior, pero usando `Bal_1`. \pause
+¿Qué pasa si no pone el parámetro `na.rm = T`?
+
+\pause
+```{r,fig.align='center',echo=FALSE}
+ggplot(data = creditcardmarketing_bbm) + 
+  geom_histogram(mapping = aes(x=Bal_1))
+```
+
+
+## Interacción de variables
+
+Con dos variables continuas:
+\pause
+
+
+```{r,eval=FALSE}
+ggplot(data = creditcardmarketing_bbm,
+       mapping = aes(x = Balance_promedio,y = Bal_1)) +
+  geom_point(na.rm =TRUE)
+```
+
+## Interacción de variables
+
+Con dos variables continuas:
+
+```{r,echo=FALSE,fig.align='center'}
+ggplot(data = creditcardmarketing_bbm,
+       mapping = aes(x = Balance_promedio,y = Bal_1)) +
+  geom_point(na.rm = TRUE)
+```
+
+## Interacción de variables
+
+Repita el gráfico anterior, pero usando `Bal_1` y `Bal_4`
+
+\pause
+
+```{r,echo=FALSE,fig.align='center'}
+ggplot(data = creditcardmarketing_bbm,
+       mapping = aes(x = Bal_1,y = Bal_4)) + 
+  # Tambien pueden ser al revés los ejes
+  geom_point(na.rm = TRUE)
+```
+
+
+## Preguntas
+
+¿Qué función de `dplyr` usaría para identificar al sujeto con `Bal_1` mayor a 3000? \pause 
+
+
+¿Cuántos tienen `Bal_4` mayor a 3000? \pause
+
+
+¿Cuántos tienen alguno de los dos anteriores? \pause 
+
+`filter(Bal_1 > 3000)` \pause
+
+`filter(Bal_4 > 3000)` \pause
+
+`filter(Bal_1 > 3000 | Bal_4 > 3000)` \pause
+
+
+## Agregar colores 
+
+\pause
+
+![A pintar!](Tarros_de_pintura.jpg)
+
+## Agregar colores
+
+Si se quieren agregar colores, se agrega en el `aes()` el parámetro `color = <VARIABLE_A_USAR>` (o `colour`):
+\pause
+
+```{r,eval = FALSE}
+ggplot(data = creditcardmarketing_bbm) +
+  geom_point(mapping = aes(x = Balance_promedio,
+                           y = Bal_1,
+                           color = Nivel_ingresos),
+             na.rm = TRUE)
+```
+
+## Agregar colores
+Y queda coloreado... \pause
+
+
+```{r,echo=FALSE,fig.align='center'}
+ggplot(data = creditcardmarketing_bbm) +
+  geom_point(mapping = aes(x = Balance_promedio,
+                           y = Bal_1,
+                           color = Nivel_ingresos),na.rm = TRUE)
+```
+
+
+## Ejercicio colores
+
+Repita el gráfico anterior, pero usando `Bal_2`, en el eje X, `Bal_3` en el eje Y, y coloreando con la columna `Premio`.
+\pause
+
+```{r,echo=FALSE,fig.align='center'}
+ggplot(data = creditcardmarketing_bbm) +
+  geom_point(mapping = aes(x = Bal_2,
+                           y = Bal_3,
+                           color = Premio),na.rm = TRUE)
+```
+
+## Transparencia
+
+\pause
+
+
+![Pero no política](rendicion-de-cuentas.jpg)
+
+## Transparencia
+
+Muchas veces quedan imágenes como la anterior en la que quedan manchas de colores en la imagen y no se entiende bien\pause, para esto se usa el parámetro `alpha`, para indicar el nivel de transparencia que se quiere en la imagen a usar:
+
+\pause
+
+```{r,eval=FALSE}
+ggplot(data = creditcardmarketing_bbm) +
+  geom_point(mapping = aes(x = Balance_promedio,
+                           y = Bal_1,color = Nivel_ingresos),
+             alpha = 1/5,
+             na.rm = TRUE)
+```
+
+Note que `alpha` es un parámetro de la función `geom_point`, no de la función `aes`
+
+## Transparencia
+
+```{r,echo=FALSE,fig.align='center'}
+ggplot(data = creditcardmarketing_bbm) +
+  geom_point(mapping = aes(x = Balance_promedio,y = Bal_1,color = Nivel_ingresos),
+             alpha = 1/5,
+             na.rm = TRUE)
+```
+
+\pause
+
+Con esto se interpreta mejor en _cuales_ lugares están concentrados los balances.
+
+## Tamaño
+
+\pause
+
+\begin{center}
+Importa
+\end{center}
+
+## Tamaño
+
+Existen bastantes más parámetros que se pueden incluir, entre estos está `size`, que puede definirse como una constante o bien, que dependa de otra variable:
+
+```{r,eval=FALSE}
+ggplot(data = creditcardmarketing_bbm) +
+  geom_point(mapping = aes(x = Balance_promedio,
+                           y = Bal_1,color = Nivel_ingresos,
+                           size = Bal_2,),
+             alpha = 1/5,
+             na.rm = TRUE)
+```
+
+## Tamaño
+
+```{r,echo=FALSE,fig.align='center'}
+ggplot(data = creditcardmarketing_bbm) +
+  geom_point(mapping = aes(x = Balance_promedio,
+                           y = Bal_1,color = Nivel_ingresos,
+                           size = Bal_2),
+             alpha = 1/5,
+             na.rm = TRUE)
+```
+
+
+## Variables continuas vs discretas
+
+Para graficar variables continuas vs las variables discretas se puede usar la función `geom_freqpoly`, que es muy similar a la función del histogram en el sentido de que muestra cual es la distribución de las variables. Solo que es más claro para agrupar en distintos grupos que en el histograma.
+
+```{r,eval=FALSE}
+ggplot(data = creditcardmarketing_bbm) + 
+  geom_freqpoly(mapping = aes(x = Balance_promedio,
+                              colour = Nivel_ingresos),
+                na.rm = TRUE,bins = 30)
+```
+
+## Variables continuas vs discretas
+
+```{r,echo=FALSE,fig.align='center'}
+ggplot(data = creditcardmarketing_bbm) + 
+  geom_freqpoly(mapping = aes(x = Balance_promedio,
+                              colour = Nivel_ingresos),
+                na.rm = TRUE,bins = 30)
+```
+
+\pause
+
+Parece que las distribuciones son similares entre los niveles de ingreso. <!---, y que hay una mayoría en los niveles de ingresos medios.--->
+
+## Verlo como porcentaje:
+\pause
+Para graficarlo como porcentaje se incluye el parámetro `y=..density..`
+\pause
+
+```{r,eval=FALSE,fig.align='center'}
+ggplot(data = creditcardmarketing_bbm) + 
+  geom_freqpoly(mapping = aes(x = Balance_promedio,
+                              colour = Nivel_ingresos,
+                              y = ..density..),
+                na.rm = TRUE,
+                bins = 30)
+```
+
+El parámetro `bins`, está predefinido como 30, y da un aviso de que vale eso. Por lo que lo ponemos explícito de que vale 30. En cursos avanzados se ven métodos para elegir este parámetro apropiadamente. \pause Si intenta no incluirlo, se indica que se pone como 30.
+
+## Verlo como porcentaje
+
+\pause
+```{r,echo=FALSE,fig.align='center'}
+ggplot(data = creditcardmarketing_bbm) + 
+  geom_freqpoly(mapping = aes(x = Balance_promedio,colour = Nivel_ingresos,y = ..density..),na.rm = TRUE,bins = 30)
+```
+
+\pause Esto nos indica que el balance promedio no depende del nivel de ingresos. 
+
+
+## Ejercicio 
+
+Repita el gráfico anterior, usando el `Bal_3` agrupando con el tipo de mensajería. \pause ¿Hay mucha diferencia?
+
+```{r,echo=FALSE,fig.align='center'}
+ggplot(data = creditcardmarketing_bbm) + 
+  geom_freqpoly(mapping = aes(x = Bal_3,
+                              colour = Tipo_mensajeria,
+                              y = ..density..),
+                na.rm = TRUE,bins = 30)
+```
+
+## Otro ejercicio
+
+En el gráfico anterior, ¿qué pasa si pone el parámetro `bins = 20`? ¿Igual a 40? ¿Igual a 2? 
+
+## Dos variables categóricas
+\pause
+
+Otro tipo de relación que se puede explorar es entre dos variables categóricas, usando la función `geom_count`, la cual agrupa entre ambas categorías y cuenta cuantos hay en cada combinación:
+\pause
+
+```{r,eval=FALSE}
+ggplot(creditcardmarketing_bbm) + 
+  geom_count(aes(Tipo_mensajeria,Premio))
+```
+
+## Dos variables categóricas
+
+
+```{r,echo=FALSE,fig.align='center'}
+ggplot(creditcardmarketing_bbm) + 
+  geom_count(aes(Tipo_mensajeria,Premio))
+```
+
+## Ejercicio count
+
+Repita el ejercicio anterior, pero revisando la relación entre `Acepta_oferta` y `Duenno_hogar`.
+\pause
+
+
+```{r,echo=FALSE,fig.align='center'}
+ggplot(creditcardmarketing_bbm) + 
+  geom_count(aes(Acepta_oferta,Duenno_hogar))
+```
+
+## Sintaxis general de un `ggplot` 
+
+Todos los gráficos que se hacen en ggplot, siguen la siguiente sintaxis:
+\pause
+
+```{r,eval=FALSE}
+ggplot(data = <Mis_Datos>) +
+  <GEOM_FUNCION>(mapping = aes(<EXPLICACION_VARIABLES_A_USAR>))
+```
+\pause
+
+
+Se le pueden agregar más _capas_, como vamos a ver proximamente...
+
+
+## Lineas
+
+Para mostrar progreso a través del tiempo de alguna variable o algo por el estilo, se pueden usar lineas, con la función `geom_line`:
+
+```{r,eval=FALSE}
+library(tidyr)
+
+creditos_Mes <- creditcardmarketing_bbm %>% 
+  gather(key = Mes,value = Balance,num_range('Bal_',1:4)) %>% 
+  separate(col = Mes,into = c('Bal','Mes'),sep = '_',convert = TRUE) %>% 
+  select(-Bal) %>% 
+  filter(Num_cliente < 10)
+
+ggplot(data = creditos_Mes,
+       aes(x = Mes,y = Balance,
+           color = factor(Num_cliente))) + 
+  geom_line()
+```
+
+\pause
+
+¿Qué hace el código anterior?
+
+## Lineas
+
+```{r,echo=FALSE,fig.align='center'}
+library(tidyr)
+
+creditos_Mes <- creditcardmarketing_bbm %>% 
+  gather(key = Mes,value = Balance,num_range('Bal_',1:4)) %>% 
+  separate(col = Mes,into = c('Bal','Mes'),sep = '_',convert = TRUE) %>% 
+  select(-Bal) %>% 
+  filter(Num_cliente < 10)
+
+ggplot(data = creditos_Mes,aes(x = Mes,y = Balance,color = factor(Num_cliente))) + 
+  geom_line()
+```
+
+
+## Ejercicio lineas
+
+\pause ¿Qué pasa si se llama sin poner el `factor` alrededor de Num_cliente? \pause Haga una nueva columna, que indique la diferencia entre `Balance_promedio` y `Balance`. Grafique esta diferencia respecto a estos meses.
+\pause
+
+```{r,echo=FALSE,fig.align='center'}
+creditos_Mes %>% 
+  mutate(Balance_dif = Balance_promedio - Balance) %>% 
+  ggplot(mapping = aes(x = Mes,y = Balance_dif,color = factor(Num_cliente))) +
+  geom_line()
+```
+
+
+
+## Capas
+\pause
+
+![Pero no para la lluvia](capa_lluvia.jpg)
+
+## Capas:
+Hasta el momento nos hemos limitado a sumar una capa, pero podemos agregarle más capas, para recalcar ciertos valores:
+
+```{r,eval=FALSE}
+creditos_Mes %>% 
+  mutate(Balance_dif = Balance_promedio - Balance) %>% 
+  ggplot(mapping = aes(x = Mes,y = Balance_dif,
+                       color = factor(Num_cliente))) +
+  geom_line() + 
+  geom_point()
+```
+
+
+## Capas:
+
+```{r,echo=FALSE,fig.align='center'}
+creditos_Mes %>% 
+  mutate(Balance_dif = Balance_promedio - Balance) %>% 
+  ggplot(mapping = aes(x = Mes,y = Balance_dif,color = factor(Num_cliente))) +
+  geom_line() + 
+  geom_point()
+```
+
+
+## Otro tipo de gráfico:
+
+Para comprender mejor la relación entre dos variables continuas, se puede usar la función `geom_bind2d`:
+
+```{r,eval=FALSE}
+creditcardmarketing_bbm %>% 
+  ggplot(aes(x =Balance_promedio,y = Bal_1)) + 
+  geom_bin2d(na.rm = TRUE)
+```
+
+
+## Otro tipo de gráfico:
+
+
+```{r,echo=FALSE,fig.align='center'}
+creditcardmarketing_bbm %>% 
+  ggplot(aes(x =Balance_promedio,y = Bal_1)) + 
+  geom_bin2d(na.rm = TRUE)
+```
+
+
+## Ejercicio `geom_bin2d`
+
+Esta función recibe un parámetro que se llama `binwidth`, que es un vector que indica cual es el grosor de los `bins` que va a hacer (similar al histograma), para contar. \pause Repita 3 veces el gráfico anterior, e incluya este parámetro usando los siguientes pares:
+
+- `c(20,20)`
+
+- `c(100,20)`
+
+- `c(30,50)`
+
+
+## Más variables...
+
+\pause 
+
+Para que el análisis descriptivo sea más claro, se pueden incluir más variables a la hora de hacer gráficos. Para esto se puede usar la capa `facet_grid`
+
+```{r,eval=FALSE}
+creditcardmarketing_bbm %>% 
+  ggplot(aes(x = Balance_promedio,y = Bal_1)) + 
+  geom_point(na.rm = TRUE) +
+  facet_grid(.~Rating)
+```
+
+
+
+## Más variables...
+
+
+```{r,echo=FALSE,fig.align='center'}
+creditcardmarketing_bbm %>% 
+  ggplot(aes(x = Balance_promedio,y = Bal_1)) + 
+  geom_point(na.rm = TRUE) +
+  facet_grid(.~Rating)
+```
+
+## Ejercicio más variables
+
+Repita el gráfico anterior, pero usando `facet_grid(Tipo_mensajeria~.)`. \pause Repita el gráfico anterior pero usando `facet_grid(Tipo_mensaeria~Rating)`\pause, y si además colorea con `Acepta_oferta`?
+
+
+## Ejercicio más variables 
+
+```{r,echo=FALSE,fig.align='center'}
+creditcardmarketing_bbm %>% 
+  ggplot(aes(x = Balance_promedio,y = Bal_1,color = Acepta_oferta)) + 
+  geom_point(na.rm = TRUE) +
+  facet_grid(Tipo_mensajeria~Rating)
+```
+
+
+## Objetos
+
+Todos los ggplots son objetos, por lo que no solo se obtiene un gráfico, sino que es fácil de conservar:
+
+```{r}
+plot_1 <- ggplot(data = creditcardmarketing_bbm) + 
+  geom_histogram(mapping = aes(Balance_promedio),
+                 bins = 30,na.rm = TRUE)
+```
+
+\pause
+Si llama `plot_1` desde la consola se despliega en la pestaña de `Plots`. \pause 
+
+
+## Graficar agregando capas
+\pause
+
+Si quiere realizar modificaciones, usa la misma sintaxis de siempre, agregando capas:
+
+```{r,eval=FALSE}
+plot_1 + 
+  facet_grid(.~Nivel_ingresos)
+```
+
+Esto se presta para ir desarrollando progresivamente los gráficos, y efectivamente ir explorando las relaciones que se puede presentar
+
+
+## Graficar agregando capas
+
+```{r,echo=FALSE,fig.align='center'}
+plot_1 + 
+  facet_grid(.~Nivel_ingresos)
+```
+
+## Box-plots
+
+Una herramienta muy útil para graficar, son los boxplots, que ayudan a entender como están distribuidas las variables y cuales son "raras"
+
+```{r,eval=FALSE}
+ggplot(data = creditcardmarketing_bbm) +
+  geom_boxplot(mapping = aes(y = Balance_promedio,x = Nivel_ingresos),
+               na.rm = TRUE)
+```
+
+## Box-plots
+
+```{r,echo=FALSE,fig.align='center'}
+ggplot(data = creditcardmarketing_bbm) +
+  geom_boxplot(mapping = aes(y = Balance_promedio,x = Nivel_ingresos),
+               na.rm = TRUE)
+```
+
+
+## Girar coordenadas
+
+Algunas veces, se tienen nombres muy largos para desplegar en el eje X, por lo que se pueden girar las coordenadas, para que se entiendan mejor, y se reciba la misma información:
+```{r,eval=FALSE,fig.align='center'}
+ggplot(data = creditcardmarketing_bbm) +
+  geom_boxplot(mapping = aes(y = Bal_3,x = Rating),
+               na.rm = TRUE) +
+  coord_flip()
+```
+
+
+
+## Girar coordenadas
+
+```{r,echo=FALSE,fig.align='center'}
+ggplot(data = creditcardmarketing_bbm) +
+  geom_boxplot(mapping = aes(y = Bal_3,x = Rating),
+               na.rm = TRUE) +
+  coord_flip()
+```
+
+
+## Titulos y ejes
+
+```{r}
+plot_titulo <- ggplot(data = creditcardmarketing_bbm) + 
+  geom_freqpoly(mapping = aes(x = Balance_promedio,
+                              colour = Nivel_ingresos,
+                              y = ..density..),
+                na.rm = TRUE,bins = 30) + 
+  ggtitle('Distribución del balance',
+          subtitle = 'Por nivel de ingresos') +
+  xlab('Balance promedio') +
+  ylab('Porcentaje')
+```
+
+
+## Titulos y ejes
+
+```{r,echo=FALSE,fig.align='center'}
+plot_titulo
+```
+
+
+## Etiquetas
+
+Bueno, pero también sería bueno poder modificar el nombre del color, y para agregar una pequeña leyenda (caption) se puede usar el parámetro `caption`:
+\pause
+```{r,eval=FALSE}
+plot_titulo +
+  labs(color = 'Nivel de ingresos',
+       caption = 'Fuente: data.world.com,\n Creacion propia')
+```
+
+## Etiquetas
+
+```{r,echo=FALSE,fig.align='center'}
+plot_titulo +
+  labs(color = 'Nivel de ingresos',
+       caption = 'Fuente: data.world.com,\n Creacion propia')
+```
+
+## labs
+
+Si se quiere, se pueden incluir todos los parámetros en la capa de labs:
+
+
+```{r,eval=FALSE}
+creditos_Mes %>% 
+  mutate(Balance_dif = Balance_promedio - Balance) %>% 
+  ggplot(mapping = aes(x = Mes,y = Balance_dif,
+                       color = factor(Num_cliente))) +
+  geom_line() + 
+  geom_point() + 
+  labs(title = 'Historia del balance',
+       subtitle = 'Por persona',
+       x = 'Mes',
+       y = 'Balance promedio - Balance observado',
+       color = 'ID Cliente')
+```
+
+
+
+## labs
+
+```{r,echo=FALSE,fig.align='center'}
+creditos_Mes %>% 
+  mutate(Balance_dif = Balance_promedio - Balance) %>% 
+  ggplot(mapping = aes(x = Mes,y = Balance_dif,color = factor(Num_cliente))) +
+  geom_line() + 
+  geom_point() + 
+  labs(title = 'Historia del balance',
+       subtitle = 'Por persona',
+       x = 'Mes',
+       y = 'Balance promedio - Balance observado',
+       color = 'ID Cliente')
+```
+
+
+
+
+
+## theme
+
+Hay varios temas que se pueden aplicar a los gráficos, para cambiar varios parámetros predefinidos. Este se agrega como una capa más. Están:
+
+>- `theme_bw()`
+>- `theme_classic()`
+>- `theme_dark()`
+>- `theme_get()`
+>- `theme_gray()`
+>- `theme_light()`
+>- `theme_linedraw()`
+>- `theme_minimal()`
+
+Y hay paquetes para incluir aún más temas...
+
+## Ejercicios
+\pause
+
+En los gráficos que usan `geom_line`, explore usar los parámetros `linetype` y `size`.
+
+\pause
+En los gráficos de `geom_bar`, explore usando el parámetro `fill`.
+
+\pause
+Juegue con los temas y los gráficos que ha hecho. Use al menos una vez cada tema.
+
+\pause
+Lea sobre `ggsave`
+
+## Próximamente:
+
+
+`optim`
