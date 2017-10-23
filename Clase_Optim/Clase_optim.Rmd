@@ -1,0 +1,352 @@
+---
+title: "Optimizar"
+author: "Jorge Loría"
+date: "October 22, 2017"
+output: beamer_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+```
+
+## Optimizar
+
+\pause
+Siempre se quiere optimizar algo, ya sea minimizar pérdidas, maximizar utilidades, entre otras... 
+
+Para esto existe una función en R que permite encontrar los puntos máximos y mínimos de una __función__ que puede recibir como parámetro. Esta función es muy flexible y se aprovecha de lo que vimos en la clase de funciones en que se pueden mandar funciones como parámetros de otras funciones.
+
+
+## Funciones
+
+Defina la siguiente función con el nombre `rast_1`:
+
+$$ 
+f(x) = 10 + (x^2 - 10 \cos(2\pi x))
+$$
+
+Nota: en R existen funciones trigonométricas que se llaman solo por su nombre `cos`, `sin`, etc... Además ya está definida la constante $\pi$ con el nombre `pi`.
+
+## `optim`
+
+¿Cuál era la función para obtener los parámetros de una función?
+\pause
+
+```{r}
+str(formals(optim))
+```
+
+
+## Optimizando
+
+Definiendo la función, se hace:
+
+```{r}
+rast_1 <- function(x)10 + (x^2 - 10 *cos(2*pi*x))
+```
+
+\pause
+Ok, grafiquémosla en el intervalo $[-5,5]$, a ver cómo se ve: 
+
+```{r}
+df1 <- data.frame(x = seq(-5,5,length.out = 1001)) %>% 
+  mutate(y = rast_1(x))
+```
+
+## Gráfico:
+
+```{r,echo=FALSE,fig.align='center'}
+df1 %>% 
+  ggplot(aes(x,y)) + 
+  geom_line() + 
+  ggtitle('Gráfico de la función Rastrigin') + 
+  theme_bw() #+ 
+  #geom_vline(xintercept = 0.5,color = 'red')
+```
+
+## Optimizando:
+
+
+Se obtiene una lista:
+
+```{r}
+l_1 <- optim(par = 0.5,fn = rast_1)
+str(l_1)
+```
+
+
+Y una advertencia...
+
+## Restricciones
+
+![Literalmente...](Acceso_Restringido.jpg)
+
+
+## Visualizar:
+
+```{r,echo=FALSE,fig.align='center'}
+df1 %>% 
+  ggplot(aes(x,y)) + 
+  geom_line() + 
+  ggtitle('Gráfico de la función Rastrigin',
+          subtitle = '(Rojo en 0.5)') +
+  theme_bw() + 
+  geom_vline(xintercept = 0.5,color = 'red') + 
+  coord_cartesian(xlim = c(0,1),ylim = c(0,25))
+```
+
+## Optimizando con restricciones: 
+
+Para optimizar con restricciones usamos el método de Brent. Pero, para usarlo indica que hay que definir bien el intervalo en que se va a realizar la optimización:
+
+
+```{r}
+l_brent <- optim(par = 0.5,fn = rast_1,
+                 method = 'Brent',
+                 lower = -5,upper = 5)
+str(l_brent)
+```
+
+## Ejercicio restricciones:
+
+Programe la siguiente función, y defínale el nombre `c_2`:
+
+$$
+f(x) = \sqrt{\pi - x} \cos(\pi - x) + \sqrt{x + \pi} \sin{(x + \pi)}
+$$
+
+
+Grafíquela en el intervalo $[-\pi,\pi]$ y optimice en el mismo intervalo.
+
+## Solución:
+
+```{r}
+c_2 <- function(x){
+  sqrt(pi - x)*cos(pi - x) + sqrt(x + pi) * sin(x + pi)
+}
+df2 <- data.frame(x = seq(-pi,pi,length.out = 10000)) %>% 
+  mutate(y = c_2(x))
+
+pl_2 <- ggplot(df2) + 
+  geom_line(aes(x = x,y = y)) + 
+  theme_bw()
+
+opt_2 <- optim(par = pi/2,c_2,method = 'Brent',
+               lower = -pi,upper = pi)
+
+df_2.1 <- data.frame(x = opt_2$par,y = opt_2$value)
+pl_2.1 <- pl_2 + 
+  geom_point(data = df_2.1,aes(x,y),color = 'red')
+```
+
+## Solución gráfica
+
+
+```{r,fig.align='center',echo=FALSE}
+pl_2.1
+```
+
+
+## Dos parámetros, uno fijo
+
+Programe la siguiente función, con el nombre `c_3`:
+
+$$
+f(x,y) = 20 + x^2 + y^2 -10(\cos(2\pi x) + \cos(2\pi y))
+$$
+
+\pause
+
+¿Cómo la podría graficar?
+
+## Solución
+
+```{r}
+c_3 <- function(x,y){
+  20 + x^2 + y^2 - 10*(cos(2*pi*x) + cos(2*pi*y))
+}
+
+s3 <- seq(-2,2,length.out = 101)
+
+df3 <- expand.grid(x = s3,y = s3) %>% 
+  rowwise() %>% 
+  mutate(z = c_3(x,y)) %>% 
+  ungroup()
+
+pl_3 <- ggplot(df3,aes(x = x,y = y,fill = z)) + 
+  geom_raster() # O puede usar geom_point
+```
+
+## Gráfico
+
+
+```{r,echo=FALSE,fig.align='center'}
+pl_3
+```
+
+## Optimizar fijando una variable ...
+
+Para optimizar fijando una variable, se usa el parámetro `...` (son tres puntos. No suspensivos.)
+
+## `...`
+\pause
+
+Uno de los parámetros más útiles (que hemos estado usando implícitamente) son los _tres puntitos_ o _ellipsis_, que lo que hacen es que pasan variables que no se han nombrado explícitamente, de una función a otra que es llamada por esta y que sí espera recibirlos. Por ejemplo:
+
+```{r}
+fun_1 <- function(...){
+  sum(...,na.rm = TRUE)
+}
+fun_1(1:5,NA,6:15)
+```
+
+## `...`
+
+Los argumentos, que se pasan con los tres puntitos también pueden ir con nombres:
+
+```{r,eval=FALSE}
+fun_2 <- function(a,b)a - b 
+fun_3 <- function(...){
+  fun_2(...)
+}
+fun_3(2,3)
+fun_3(b = 2,a = 3)
+```
+
+\pause
+
+Y toman los nombres de la función que recibe los 3 puntitos.
+
+## ... Optimizar fijando una variable
+
+
+```{r}
+opt_3 <- optim(par = 0.1,c_3,y = 0.76)
+str(opt_3)
+```
+
+Grafique la función con `y` fijo, y su respectiva solución.
+
+## Solución
+
+```{r}
+pl_3.1 <- df3 %>% 
+  filter(abs(y - 0.76)<0.01) %>% 
+  ggplot(aes(x,y=z)) + 
+  geom_line() + 
+  geom_vline(xintercept = opt_3$par,color = 'red')
+```
+
+
+
+## Gráfico
+
+```{r,fig.align='center',echo=FALSE}
+pl_3.1
+```
+
+## Función con dos parámetros
+
+Ahora vamos a optimizar la misma función, pero sobre los dos parámetros a la vez:
+
+\pause
+
+```{r}
+c_4 <- function(xy){c_3(xy[1],xy[2])}
+opt_4 <- optim(par = c(0.2,0.2),c_4)
+```
+
+
+## Gradiente
+También se puede incluir el gradiente para realizar la optimización, este debe ser una función que retorne un vector de `n` variables, con `n` la cantidad de entradas que recibe la función a optimizar
+
+Recordando c_3, sabemos que la función es simétrica en sus entradas, y que cada una de sus derivadas va a ser igual, pero cambiando la variable.
+
+
+
+## Gradiente calculado
+Es decir:
+```{r}
+derivada_parcial <- function(xoy){
+  2*xoy + 20*pi*sin(2*pi*xoy)
+}
+
+grad_4 <- function(xy){
+  c(derivada_parcial(xy[1]),
+    derivada_parcial(xy[2]))
+}
+```
+
+## Optimizar con gradiente
+
+Para optimizar con gradiente se utiliza el método `'CG'`, o el `'BFGS'` 
+
+
+```{r}
+opt_5 <- optim(par =c( 0.2,0.2),fn = c_4,
+                gr = grad_4,method = 'CG')
+str(opt_5)
+```
+
+\pause
+Repita el ejercicio anterior, pero usando el método `'BFGS'`.\pause ¿Qué pasa si pone `par = c(1,1)`?
+
+## Problema
+
+Intente optimizar usando el método Brent, con restricciones para encontrar un mínimo global.
+
+\pause
+Da un error, pues este método es para una sola dimensión. 
+
+## Método `'L-BFGS-B'`
+
+Al usar este método, se realiza la optimización en una "caja" y se obtiene el resultado deseado:
+
+```{r}
+opt_6 <- optim(par =c( 1,1),fn = c_4,
+      gr = grad_4,
+      method = 'L-BFGS-B',
+      lower = c(-5,-5),upper = c(5,5))
+str(opt_6)
+```
+
+## Ejercicio
+
+Realice el llamado anterior pero sin llamar al gradiente.
+
+## En "general"
+
+Se puede tener una función de tantas variables como se quiera:
+
+```{r }
+flb <- function(x){ 
+  p <- length(x) 
+  sum(c(1, rep(4, p-1)) * (x - c(1, x[-p])^2)^2) 
+}
+```
+
+
+Y realizar la optimización para la cantidad de variables que se requiera:
+```{r}
+opt_gen <- optim(rep(3, 25), fn = flb, 
+                 gr = NULL, method = "L-BFGS-B",
+                 lower = rep(1, 25), 
+                 upper = rep(4, 25))
+```
+
+
+## Resultado
+```{r,echo=FALSE}
+opt_gen 
+```
+
+
+## Ejercicio
+
+
+Repita el ejercicio anterior, pero usando 3, 4 y 5 variables.
+\pause
+
+Programe una función que reciba un entero positivo, y que realice la minimización anterior para esa cantidad de variables.
