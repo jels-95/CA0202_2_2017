@@ -713,19 +713,369 @@ Hay varios temas que se pueden aplicar a los gráficos, para cambiar varios par�
 
 Y hay paquetes para incluir aún más temas...
 
+
+## Escala
+
+\pause
+
+![Pero no montañas](montanna.jpg){width=80%}
+
+
+## Escala
+\pause
+Muchas veces se quieren modificar los parámetros que se tienen predefinidos. Es por esto que se define la capa de escalas, para poder cambiar a gusto del usuario/programador/analista estos valores predefinidos.
+
+\pause
+```{r}
+plot_2 <- ggplot(data = creditcardmarketing_bbm) +
+  geom_bar(mapping = aes(x = Num_cuentas,fill=Acepta_oferta))
+```
+
+¿Cómo se ve el gráfico anterior? \pause Para cambiar los colores que se usan, e incluso las viñetas asociadas a los colores, se usa `scale_fill_manual`
+
+```{r,eval=FALSE}
+plot_2 + 
+  scale_fill_manual(values = c('red','green'))
+```
+
+## Escala
+
+```{r,echo=FALSE,fig.align='center'}
+plot_2 + 
+  scale_fill_manual(values = c('red','green'))
+```
+
+
+## Escala, etiquetas
+
+Si además se le quieren cambiar las etiquetas que se usan, en lugar de `'No'` y `'Yes'`. Se puede usar el parámetro \pause `labels`, en el mismo orden que se usa para `values`.
+
+
+```{r,eval=FALSE}
+plot_2 + 
+  scale_fill_manual(values = c('red','green'),
+                    labels = c('Noup','Sip'))
+```
+
+## Escala, etiquetas plot
+
+```{r,eval=FALSE}
+plot_2 + 
+  scale_fill_manual(values = c('red','green'),
+                    labels = c('Noup','Sip'))
+```
+
+
+
+## Escalas, aún más!
+
+Algunas veces es informativo cambiar la escala de alguno de los ejes. Por ejemplo, pasarlo a base logarítmica, raíz cuadrada, revertirlo, entre otras... Por ejemplo:\pause
+
+```{r,eval=FALSE}
+plot_2 + 
+  scale_fill_manual(values = c('red','green'),
+                    labels = c('Noup','Sip')) +
+  scale_y_log10() +
+  scale_x_reverse()
+```
+
+
+## Escalas, aún más, gráfico:
+
+\pause
+
+```{r,echo=FALSE,fig.align='center'}
+plot_2 + 
+  scale_y_log10() +
+  scale_fill_manual(values = c('red','green'),
+                    labels = c('Noup','Sip')) +
+  scale_x_reverse()
+```
+
+## Ejercicio
+
+Repita el gráfico anterior, quitando cada capa al menos una vez, note las diferencias. \pause Repita uno de los gráficos anteriores y cambie el `scale_y_log10` por `scale_y_sqrt`.
+
+\pause
+
+Regrese al gráfico en que se hace el `geom_bin2d`, y agregue una capa usando: `scale_fill_distiller`. Esta función recibe varios parámetros, la idea es que utilice el parámetro `palette` y use alguno de las siguientes strings como valor: `'Spectral','Set1','Set2','Set3','Greens'`. \pause ¿Qué pasa si además incluye el parámetro `direction = -1`? ¿Y si pone `direction = -7`?
+
+
+## Ejercicio fill
+
+```{r,echo = FALSE,fig.align='center'}
+creditcardmarketing_bbm %>% 
+  ggplot(aes(x =Balance_promedio,y = Bal_1)) + 
+  geom_bin2d(na.rm = TRUE) + 
+  scale_fill_distiller(palette = 'Spectral',direction = -1)
+```
+
+## Más escalas...
+
+Existen escalas para un montón de parámetros más. Por ejemplo, el tipo de linea (`scale_linetype`), la transparencia (`scale_alpha`), el tamaño `scale_size`, la forma (este es un parámetro de `geom_point`) usando  `scale_shape`. 
+
+Y hay otro montón de formas de manipular las escalas...
+
+
+## Estadísticas
+\pause
+Algunas veces se quieren agregar funciones para realizar una comparación entre los datos con una función particular. 
+
+Por ejemplo, si queremos comparar los balances históricos de la persona 1 con la función lineal `f(x) = a*x+b`, con `a = 570` y `b = -1425`. Definimos la función anterior.
+\pause
+
+```{r}
+linea_5 <- function(x){-1425 + 570*x}
+```
+
+\pause
+Para evaluarlo, usamos:
+
+```{r}
+plot_3 <- creditos_Mes %>%
+  filter(Num_cliente == 5) %>% 
+  mutate(Balance_dif = Balance_promedio - Balance) %>% 
+  ggplot(mapping = aes(x = Mes,y = Balance_dif)) +
+  geom_line(size = 1.5,color = 'green') + 
+  geom_point(size = 1.2,color= 'red') + 
+  stat_function(fun = linea_5,color = 'blue',size = 1.1)
+```
+
+## Estadísticas
+
+
+```{r,echo=FALSE,fig.align='center'}
+plot_3
+```
+
+## Ejercicio 
+Repita el gráfico anterior, pero usando una cuadrática `g(x) = a*x^2 + b*x + c`, con `a = -41.5, b = 777.5,c = -1632.5`. ¿cuál gráfico se ve como una mejor aproximación?
+
+
+
+```{r,echo=FALSE,fig.align='center',fig.height=4}
+a = -41.5
+b = 777.5
+c = -1632.5
+curva_5 <- function(x){a*x^2 + b*x + c}
+creditos_Mes %>%
+  filter(Num_cliente == 5) %>% 
+  mutate(Balance_dif = Balance_promedio - Balance) %>% 
+  ggplot(mapping = aes(x = Mes,y = Balance_dif)) +
+  geom_line(size = 1.5,color = 'green') + 
+  geom_point(size = 1.2,color= 'red') + 
+  stat_function(fun = curva_5,color = 'blue',size = 1.1)
+```
+
+
+## `stat_unique`
+
+Esta función lo que hace es que elimina los valores repetidos del gráfico:
+
+```{r,eval=FALSE}
+creditcardmarketing_bbm %>% 
+  ggplot(aes(x=Acepta_oferta,y = Premio)) + 
+  geom_point() + 
+  stat_unique()
+```
+
+
+
+## `stat_unique`, gráfico
+
+```{r,echo=FALSE,fig.align='center'}
+creditcardmarketing_bbm %>% 
+  ggplot(aes(x=Acepta_oferta,y = Premio)) + 
+  geom_point() + 
+  stat_unique()
+```
+
+
+## Coordenadas 
+
+Como en un mapa. \pause
+
+La mayoría de gráficos que se hacen (como los de puntos), tienen coordenadas en sus ejes `(X, Y)`. Esta capa se encarga de modificar el comportamiento predefinido. Funciona para hacer _zoom_ a una parte del gráfico, o alejarse de una sección, modificar perspectivas, o realizar transformaciones.
+
+
+## `zoom`
+\pause
+
+Esto se hace usando la capa `coord_cartesian`, la cual tiene 2 parámetros: `xlim` y `ylim`. Estos toman un vector con dos entradas, las cuales indican en qué sección del gráfico original se van a concentrar.
+
+```{r}
+plot_5 <- creditcardmarketing_bbm %>% 
+  ggplot(aes(x = Balance_promedio)) + 
+  geom_histogram(fill = 'white',color = 'black',
+                 na.rm = TRUE)
+```
+
+¿Cómo se ve este gráfico? \pause Para hacerle _zoom_ al área cerca del 2000, hacemos:
+
+```{r,eval=FALSE}
+plot_5 + 
+  coord_cartesian(xlim = c(1900,2100))
+```
+
+## zoom
+```{r,echo=FALSE,fig.align='center'}
+plot_5 + 
+  coord_cartesian(xlim = c(1900,2100))
+```
+## zoom
+
+El gráfico anterior, aún no se ve bien. Pues falta hacerle zoom también al eje y, por lo que hacemos:
+
+```{r,eval=FALSE}
+plot_5 + 
+  coord_cartesian(xlim = c(1900,2100),ylim = c(0,50))
+```
+
+
+
+## zoom
+
+```{r,echo=FALSE,fig.align='center'}
+plot_5 + 
+  coord_cartesian(xlim = c(1900,2100),ylim = c(0,25))
+```
+
+
+## Proporcional
+
+Esta capa recibe el parámetro `ratio`, el cual se encarga de indicar cuanto vale el tamaño a mostrar del eje y sobre el del eje x.
+
+```{r,eval=FALSE}
+plot_5 + 
+  coord_fixed(ratio = 7)
+```
+
+## Proporcional
+
+```{r,echo=FALSE,fig.align='center'}
+plot_5 + 
+  coord_fixed(ratio = 7)
+```
+
+## Ejercicios proporcional
+
+Repita el gráfico anterior usando `ratio = 1/7`, luego `ratio = 1`, y `ratio = 1/3`.
+
+## `coord_polar`
+
+Sirve para hacer gráficos de porcentajes. Los cuales pocas veces son recomendados, pues los humanos somos malos distinguiendo ángulos. Muchas veces es mejor usar un gráfico de barras sencillo:
+
+```{r,eval=FALSE}
+df <- data.frame(
+  variable = c("Ganas de estar en clase en verde", 
+               "Ganas de estar en clase"),
+  value = c(47.19, 53.81)
+)
+
+
+ggplot(df, aes(x = "", y = value, fill = variable)) +
+  geom_col(width = 1) +
+  scale_fill_manual(values = c("lightblue","green")) +
+  coord_polar("y", start = pi / 3)
+```
+
+## `coord_polar`, gráfico
+
+```{r,echo=FALSE,fig.align='center'}
+df <- data.frame(
+  variable = c("Ganas de estar en clase en verde", 
+               "Ganas de estar en clase"),
+  value = c(47.19, 53.81)
+)
+
+
+ggplot(df, aes(x = "", y = value, fill = variable)) +
+  geom_col(width = 1) +
+  scale_fill_manual(values = c("lightblue","green")) +
+  coord_polar("y", start = pi / 3)
+```
+
+
+## Ejercicio de `coord_polar`
+
+Repita el gráfico anterior, pero quite la capa de `coord_polar`.\pause ¿cuál gráfico entiende mejor?
+\pause
+
+Haga un gráfico similar al anterior, pero usando 3 grupos distintos.
+\pause
+
+Haga un pac-man
+
+## `coord_polar` 
+
+Si se quieren "comparar" tamaños de grupos, usando este tipo de gráficos, se puede hacer:
+
+
+
+```{r,eval=FALSE}
+creditcardmarketing_bbm %>% 
+  ggplot(aes(x = Nivel_ingresos)) + 
+  geom_bar(width = 1,colour = 'red',fill = 'orange') + 
+  coord_polar()
+```
+
+
+## Gráfico
+
+```{r,echo=FALSE,fig.align='center'}
+creditcardmarketing_bbm %>% 
+  ggplot(aes(x = Nivel_ingresos)) + 
+  geom_bar(width = 1,colour = 'red',fill = 'orange') + 
+  coord_polar()
+```
+
+## Tipos de capas:
+
+En general hay 5 capas generales para generar un gráfico usando `ggplot2`
+\pause
+
+>- `geom_*`, que indica la forma en que se van a graficar los datos 
+
+>-- ¿cuales hemos visto?
+
+>- `stat_*`, que realiza una transformación (resumen) en los datos y lo grafica
+
+>- `scale_*_**`, sirva para cambiar algún parámetro predefinidio
+
+>- `coord_*`, cambia el tipo/tamaño de las coordenadas que se usan
+
+>- `facet_*`, puede ser `grid` o `wrap`
+
 ## Ejercicios
+
 \pause
 
 En los gráficos que usan `geom_line`, explore usar los parámetros `linetype` y `size`.
 
 \pause
-En los gráficos de `geom_bar`, explore usando el parámetro `fill`.
+En los gráficos de `geom_bar`, explore usando el parámetro `fill` dentro de `aes` . ¿Qué pasa si pone `position='dodge'`, como parámetro dentro de un `geom_bar`?
 
 \pause
-Juegue con los temas y los gráficos que ha hecho. Use al menos una vez cada tema.
+Juegue con los temas y los gráficos que ha hecho. Use al menos una vez cada tema. ¿Cuál le gusta más?
 
 \pause
-Lea sobre `ggsave`
+Lea sobre `ggsave`, usando la ayuda que se provee en R
+
+
+## Más colores?
+
+Ver dataframe `luv_colours` 
+
+```{r,echo=FALSE,fig.align='center'}
+ggplot(luv_colours, aes(u, v)) +
+  geom_point(aes(colour = col), size = 3) +
+  scale_color_identity() +
+  coord_equal()
+```
+
+## Más información sobre ggplot2
+
+[Sitio de referencia de ggplot2](http://ggplot2.tidyverse.org/reference/index.html)
 
 ## Próximamente:
 
