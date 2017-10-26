@@ -1,0 +1,81 @@
+---
+title: "Ejercicios optim y ggplot"
+author: "Jorge Loría"
+date: "Oct 25, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Gráficos
+
+#### Usando la base de datos de las empresas que se le entregaron, realice los siguientes ejercicios. 
+
+#### Para cada ejercicio con número par use un tema (`theme_*`), y para los gráficos que **incluyan** colores indique en español el título del gráfico. Este debe ser una breve descripción de qué muestra el gráfico.
+
+0. Cambie el nombre de las columnas `% growth` y `Revenue Raw`, por nombres sin caracteres especiales (%) ni espacios.
+
+1. Haga un gráfico de puntos usando como eje X el rank, y el eje Y las ganancias netas (Revenue Raw). 
+
+2. Usando un gráfico de barras, identifique cual es el estado (`state`) que tiene más de estas empresas 
+
+3. Haga un gráfico de lineas usando como eje X el rank, y como eje Y el crecimiento (% growth). Utilice el comando `scale_x_reverse` para que quede el eje X con la primera empresa del lado derecho, y la empresa 5000 del lado izquierdo. 
+
+4. Compare, usando `geom_bin2d` la cantidad de gente que hay en cada empresa, con el crecimiento que experimentan en ese año. 
+
+5. Repita el gráfico anterior pero usando escala logarítmica en ambos ejes. ¿Cree que hay alguna relación entre la cantidad de gente que hay en la empresa y el crecimiento de la empresa?
+
+6. Haga un histograma para la cantidad de gente que hay en las empresas.
+
+7. Haga un boxplot por industria, con los crecimientos que experimentan en el 2017. Agregue como parámetro del `aes` el `fill` llenando con el tipo de industria. Agregue a este gráfico una escala logarítmica en el eje Y. Luego gire las coordenadas, usando `coord_flip` para esto.
+
+8. Haga un nuevo dataframe que se llame `Top10`, que tenga las empresas que estén en las 10 industrias con más empresas.
+
+9. Haga un gráfico de `freqpoly` de las ganancias de las empresas que están en el dataframe `Top10`, usando para colorear la Industria a la que pertenece. Aplique una escala logarítmica en el eje x, y en freqpoly incluya el parámetro `bins = 45`.
+
+10. En `Top10` agregue una nueva columna, que sea el grupo de miles en que está el `rank` de esa empresa (_Sugerencia_: tome parte entera de (rank -1)/1000), usando `factor` al definir esta variable. Haga un gráfico de barras en que las barras sean de las industrias, y los colores sean del grupo de miles que definió al inicio. Incluya en `geom_bar` los parámetros: `color = 'black'`, y `position = 'dodge'`.
+
+Repita este gráfico usando los datos originales, y note que las leyendas del eje X se ven poco claras. Gire el gráfico usando `coord_flip`.
+
+11. En `Top10` haga un histograma de la distribución de la cantidad de personas que están contratadas por empresa, usando `facet_wrap` para separar por empresa. Agregue una capa de escala logarítmica en el eje X, y agregue un más 1 a la cantidad de personas.
+
+
+## Optimizando
+
+1.  Programe la función $f(x) = \sin(x\cos(x))$. Grafíquela entre $0$ y $10$. ¿Cuántos puntos mínimos sospecha que hay?  Busque en R estos puntos usando `optim` con el método `"Nelder-Mead"` (el que viene por default), y tomando como parámetros iniciales: 2, 4, 6, 7, 8 y 9.
+
+Cree una lista que tenga las 6 optimizaciones del ejercicio anterior. 
+
+2. Optimice la función del ejercicio anterior, pero esta vez usando el método de `Brent` en el intervalo $[0,10]$.
+
+3. Programe la siguiente función que reciba un vector $\mathbf{x}=(x_1,\dots,x_d)$ de $d$ dimensiones. 
+
+$$
+f(\mathbf{x}) = 1 - \Big(\sin^2(\pi w_i) + (w_d -1)^2[1+\sin^2(2\pi w_d)] + \sum_{i=1}^{d-1}[1 + 10\sin^2(\pi w_i + 1)] \Big)
+$$
+con,
+
+$$
+w_i = 1 + \frac{x_i -1}{4}
+$$
+para cada $i = 1, \dots, d$.
+
+Usando `optim` encuentre el __máximo__ para $9$ dimensiones en el cubo $[-10,10]^9$.  El parámetro `control` recibe una **lista** de parámetros opcionales (que ya tiene predefinidos). Para maximizar, debe incluir en la lista `fnscale = -1`.
+
+4. Intente encontrar el mínimo de la función $g(x) = 1-x^2$, sin definir un intervalo. 
+
+5. Defina la función que reciba 3 parámetros:
+
+
+$$
+\varphi_{\mu,\sigma}(x) = \frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}
+$$
+
+
+Esta función tiene usos en probabilidad, y se le llama función de distribución de la normal con **media** $\mu$, y **varianza** $\sigma^2$. Grafique esta función y optimícela (¿máximo o mínimo?), fijando $\mu = 1500$ y $\sigma = 500$.
+
+
+
