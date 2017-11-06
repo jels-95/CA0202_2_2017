@@ -1,0 +1,527 @@
+---
+title: "Fechas"
+author: "Jorge Loría"
+date: "Nov 1, 2017"
+output: beamer_presentation
+---
+
+```{r setup, include=FALSE}
+load(file = 'Fechas.RData')
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Trabajar con fechas siempre es un dolor
+
+- ¿Todos los años tienen 365 días?
+
+- ¿Todos los días tienen 24 horas?
+
+- ¿Todos los minutos tienen 60 segundos?
+
+## `lubridate`
+
+La idea de este paquete es que sea lo más sencillo posible tratar con fechas y momentos del día.
+
+```{r,message=FALSE}
+library(dplyr)
+library(lubridate)
+today()
+now()
+```
+
+## Formas de conseguir una fecha
+
+
+>- De texto: `'2017-11-01'`
+
+>- Componentes individuales: Año = `2017`, Mes = `11`, Día = `1`
+
+>- De otro objeto de fecha
+
+## De texto
+\pause
+
+![Pero no mensajes](text-from-dog.jpg){width=80%}
+
+## De texto
+\pause
+
+Como hay muchas formas de escribir una misma fecha, para cada una de estas hay una función de `lubridate`, para interpretarla. Solo que estamos limitados a **inglés**. Pero todas las siguientes fechas representan la misma fecha:
+
+```{r}
+fecha1 <- '2015-22-03'
+fecha2 <- '2015-03-22'
+fecha3 <- '3-22-2015'
+fecha4 <- 'Mar-22-2015'
+fecha5 <- 'March 22nd, 2015'
+fecha6 <- '22/03/2015'
+fecha7 <- 20150322
+```
+
+\pause
+
+Para convertirlas a un objeto tipo fecha usamos, respectivamente, las funciones: `ydm, ymd, mdy, mdy, mdy, dmy, ymd`.\pause Convierta las fechas anteriores a fecha, usando las respectivas funciones.
+
+```{r,echo=FALSE,include=FALSE}
+ydm(fecha1)
+ymd(fecha2)
+mdy(fecha3)
+mdy(fecha4)
+mdy(fecha5)
+dmy(fecha6)
+```
+
+## De texto
+\pause
+
+Por lo que basta con reconocer en qué orden están el año, mes y día, y acomodar las siglas correspondientes a la fecha que se está tratando.
+
+\pause
+Cargue el archivo `Fechas.RData` que se le entregó, luego usando la función que corresponda, convierta la fecha de la tabla de Nacimientos a formato de fecha de lubridate. ¿Qué función usa? \pause Repita lo anterior, pero usando la tabla de `Hijos`
+
+\pause
+```{r}
+load(file = 'Fechas.RData')
+Fechas_Nacimiento <- Nacimientos %>% 
+  mutate(Fecha = ymd(Fecha))
+Hijos <- Hijos %>% 
+  mutate(Nacimiento_Hijo = ymd(Nacimiento_Hijo))
+str(Fechas_Nacimiento)
+```
+
+## Componentes individuales
+\pause
+Algunas veces las fechas están separadas, como es el caso de la tabla de fallecimientos
+
+Para esto se usa la función `make_date`, que recibe como parámetros: `year`, `month` y `day`.
+
+```{r}
+fecha8 <- make_date(year = 2017,month = 3,day = 22)
+fecha8
+```
+\pause
+¿Qué pasa si alguno(s) de los parámetros de `make_date` es de tipo character (string)? \pause En la tabla de fallecimientos, defina una columna que tenga la fecha como objeto date, usando la función `make_date`, y las columnas correspondientes.
+
+
+
+## Solución Fallecimientos
+\pause
+```{r}
+Fallecimientos_f <- Fallecimientos %>% 
+  transmute(Fecha = make_date(year = Anno_Muerte,
+                           month = Mes_Muerte,
+                           day = Dia_Muerte),
+            ID)
+str(Fallecimientos_f)
+```
+
+
+## Componentes individuales
+
+También se pueden manejar fechas junto con el tiempo en un mismo objeto, usando la función `make_datetime`:
+
+```{r}
+tiempo1 <- make_datetime(year = 2017,month = 3,day = 22,
+              hour = 1,min = 53,sec = 10)
+tiempo1
+```
+
+Note que al final viene la zona horaria, que usa la zona `UTC` de forma predefinida. \pause Para saber en cuál zona horaria estamos, se usa `Sys.timezone()`. Si se quiere indicar, se puede usar en el parámetro `tz`. \pause ¿En qué zona horaria está su computadora?
+\pause
+
+Cree una columna con fecha **y** tiempo para la tabla de fallecimientos.
+
+## Solución fallecimientos
+
+```{r}
+Fallecimientos <- Fallecimientos %>% 
+  transmute(Fecha_tiempo = make_datetime(year = Anno_Muerte,
+                           month = Mes_Muerte,
+                           day = Dia_Muerte,
+                           hour = Hora_Muerte,
+                           min = Minuto_Muerte),
+            ID)
+str(Fallecimientos)
+```
+
+
+## De otros tipos
+
+Se puede usar la función `as_datetime` para convertir un objeto tipo fecha, a un objeto que incluya la hora.
+
+```{r}
+as_datetime(fecha8)
+```
+
+Y también se puede convertir un objeto tipo `POSIXct` (tiempo) a fecha, usando `as_date`
+
+
+## Otras formas de convertir:
+\pause
+
+![](WOLOLO.jpg)
+
+## Otras formas de convertir:
+\pause
+Además de las funciones tipo `ymd`, hay otras en las que se pueden especificar la hora, minuto y mes al objeto que se crea:
+
+```{r}
+fecha_g <- ymd_hms('2017-10-20 15:35:20',
+                   tz = 'America/Guatemala')
+fecha_g_2 <- ymd_hm('2017-10-20 15:35',
+                   tz = 'America/Guatemala')
+fecha_g_3 <- ymd_h('2017-10-20 15',
+                   tz = 'America/Guatemala')
+```
+
+## Obtener los componentes
+
+\pause
+Muchas veces no se ocupa toda la fecha, sino uno de sus componentes. Para esto se pueden usar las siguientes funciones:
+
+| función | Resultado| 
+|--------:|:---------|
+|`year`   |año       |        
+|`month`  |mes        |
+|`day`    |día del mes | 
+|`mday`   |día del mes  | 
+|`yday`   |día del año  |
+|`wday`   |día de la semana |
+
+\pause Las funciones `month`.`mday` tiene dos parámetros opcionales
+
+\pause
+Compruebe el valor en `fecha_g` de las funciones anteriores.
+
+
+## Ejercicio:
+
+Haga un gráfico de barras (en ggplot), usando el día de la semana de las fechas de nacimiento. 
+
+\pause
+Repita el gráfico anterior pero usando un `facet_wrap` con los meses. ¿Concluye algo distinto o similar? ¿Qué otro gráfico podría hacer?
+
+## Solucion:
+
+```{r}
+library(ggplot2)
+Plot_Semana_Mes <- Fechas_Nacimiento %>% 
+  mutate(Dia_Sem = wday(Fecha,label = TRUE,abbr = TRUE),
+         Mes = month(Fecha,label = TRUE,abbr = FALSE)) %>% 
+  ggplot(aes(Dia_Sem)) +
+  geom_bar() + 
+  facet_wrap('Mes') +
+  theme_bw()
+```
+
+## Solucion
+
+```{r,echo=FALSE,fig.align='center'}
+Plot_Semana_Mes
+```
+
+## Redondear
+
+\pause
+
+![](Circle.png)
+
+
+## Redondear 
+
+Estas funciones reciben primero la fecha, y luego la unidad de tiempo (semana, mes, año, etc...) con la que se quiere efectuar el redondeo.
+
+Las funciones son: `floor_date`, `round_date` y `ceiling_date`. 
+<!---Funcionan similar a floor, round y ceil--------->
+
+Entonces, si queremos saber cuál es el inicio del mes, hacemos:
+```{r}
+floor_date(fecha_g,unit = 'month')
+```
+
+\pause
+¿Qué comandos puede combinar para saber qué día comienza la semana?
+\pause
+
+```{r,eval=FALSE}
+wday(floor_date(today(),unit = 'week'),label = TRUE)
+```
+
+## Modificar componentes
+
+También se pueden modificar los componentes de las fechas usando las mismas funciones que se mencionan antes:
+
+```{r}
+year(fecha_g) <- 2014
+fecha_g
+```
+\pause
+```{r}
+month(fecha_g) <- 3
+fecha_g
+```
+\pause
+```{r}
+yday(fecha_g) <- 10
+fecha_g
+```
+
+
+## `update`
+
+\pause
+
+![Por favor de Windows no](windows_update.png)
+
+## `update`
+\pause
+
+Esta función permite realizar cambios usando una fecha de referencia, sin cambiar la fecha "base". Por ejemplo:
+
+```{r}
+fecha_2g <- update(fecha_g,month =2)
+c(fecha_2g,fecha_g)
+```
+\pause
+¿Cómo haría para saber cuál es el mes y año que tiene mayor cantidad de nacimientos de los hijos?
+
+## Solución
+
+```{r}
+Hijos %>% 
+  mutate(Anno_mes = update(Nacimiento_Hijo,mday = 1)) %>% 
+  group_by(Anno_mes) %>% 
+  summarise(Total = n()) %>% 
+  arrange(Total) %>% 
+  tail(1)
+```
+
+
+## Duraciones
+
+Muchas veces uno quiere trabajar con intervalos de tiempo, una duración (`duration`) es lo que se obtiene al sacar la diferencia entre dos fechas:
+
+```{r}
+tiempo_lectivo <- today() - ymd(20170807)
+as.duration(tiempo_lectivo)
+```
+
+La ventaja de las duraciones es que se pueden sumar (y restar) de forma cómoda con las fechas:
+
+```{r}
+as.duration(tiempo_lectivo) + today()
+```
+
+## Duraciones
+
+En el fondo, lo que hacen los objetos `duration` es que cuentan segundos, y a partir de esto operan con las fechas. Para esto, existen varios constructores de duraciones que son:
+```{r,eval=FALSE}
+dseconds(c(46,99))
+dminutes(31)
+dhours(c(12,48))
+ddays(c(2,62))
+dweeks(15)
+dyears(0:2)
+```
+
+## Ejercicios:
+
+¿Qué fecha fue hace: un año, 2 semanas y 96 horas?
+
+¿Cuál es el ID que tuvo un hijo a la edad más joven?
+
+¿Cuál es el ID que falleció teniendo el hijo más reciente?
+
+## Multiplicar duraciones
+
+También se pueden multiplicar duraciones, lo cual va a multiplicar la cantidad de segundos que corresponden a esa duración.
+
+```{r}
+today() + (dyears(1)+ ddays(25) - dweeks(7))*2
+```
+
+## Fallas de duraciones
+
+¿Qué pasa si nos devolvemos un año desde el primero de enero? 
+\pause
+
+```{r}
+ymd(20170101) - dyears(1)
+```
+
+**¡Falla!** \pause
+Pues el 2016 es año bisiesto, por lo que tiene 366 días. \pause Si tuviéramos horario de veranos también perderíamos una hora en ciertos días del año.
+
+```{r}
+fecha_falla <- ymd_hms('20170312 00:00:00',tz = 'America/New_York')
+fecha_falla + ddays(1)
+```
+
+Un día de 25 horas... Casual...
+
+## Periodos
+\pause
+
+
+## Periodos
+\pause
+
+Como vimos, las duraciones pueden fallar. Es por esto que se usan los periodos, que funcionan en tiempos de "humanos", y si mantienen la consistencia en este sentido. Se pueden usar con la función: `as.period`
+
+```{r}
+as.period(tiempo_lectivo) + today()
+```
+
+Se pueden definir, de forma similar a las duraciones, usando las funciones: 
+```{r,eval=FALSE}
+seconds(c(46,99))
+minutes(31)
+hours(c(12,48))
+days(c(2,62))
+weeks(15)
+months(2)
+years(0:2)
+```
+
+## Comparemos:
+
+```{r}
+fecha_falla + days(1)
+```
+
+```{r}
+ymd(20170101) - years(1)
+```
+
+
+## Meses 
+
+Note que ahora **sí** tenemos meses. No se pueden usar como duraciones, pues no hay una cantidad "estándar" de duración para un mes.
+\pause
+
+Incluir los meses tiene un _costo_ implícito, que es que no todas las fechas están bien definidas para un mes después. Por ejemplo, un mes después del 31 de marzo, puede ser:
+\pause
+
+1. 31 de abril, que no existe
+\pause
+
+2. 1ro de mayo, 31 días después
+\pause
+
+3. 30 de abril
+
+## Meses
+
+Solo la primera de estas opciones cumple el hecho de que $a + b - b = a$. Pero las otras opciones también están implementadas, o se puede obtener usando un poco de aritmética sencilla:
+
+```{r}
+marzo31 <- ymd(20170331)  
+marzo31 + months(1)
+marzo31 + days(31)
+marzo31 %m+% months(1) # Para restar se usa %m-%
+```
+
+Pero se tiene que tener **mucho** cuidado con el orden, pues no lo preservan...
+
+## Intervalos
+
+
+¿Cuántos días hay en un año? \pause
+```{r}
+years(1)/days(1)
+```
+
+\pause Depende del año! Para esto se usan los intervalos, que guardan la información del inicio y del final del _intervalo_ de tiempo.
+
+
+
+## Intervalos
+\pause
+
+Se pueden definir usando:
+
+```{r}
+inv_1 <- interval(start = marzo31,
+         end = today())
+int_length(inv_1)
+```
+
+\pause
+
+Esto no es muy útil. Pero se puede convertir, ahora sí, a una duración o a un periodo:
+
+```{r}
+as.period(inv_1)
+as.duration(inv_1)
+```
+
+
+
+## Intervalos 
+
+También, se puede definir usando:
+
+```{r}
+inv_2 <- today() %--% marzo31
+```
+\pause
+
+Hay funciones para accesar el inicio y el final de los intervalos, llamadas: `int_start` e `int_end`. 
+\pause
+
+Note que acá se tiene que la fecha de hoy es el inicio del intervalo. \pause Por lo que podemos hacer un `int_flip` con este intervalo para obtener el intervalo igual a `inv_1`
+
+```{r}
+inv_2 <- int_flip(inv_2)
+inv_2
+```
+
+## Intervalos
+
+
+Si se quiere obtener en cierta unidad de tiempo, se puede hacer la división por una unidad de ese tiempo:
+
+```{r}
+inv_2/days(1)
+inv_2/months(1)
+inv_2/weeks(1)
+```
+
+## Operaciones de intervalos
+
+Para comparar intervalos se puede hacer:
+`int_overlaps`, para identificar si dos intervalos comparten al menos un segundo.
+
+Para saber si comienzan o terminan en el mismo momento, se puede usar `int_align`.
+
+
+## Mover un intervalo
+
+Para mover un intervalo se puede usar `int_shift`, indicando el intervalo y la cantidad de tiempo que se quiere correr:
+
+```{r}
+int_shift(inv_2,by = days(1))
+int_shift(inv_2,by = months(1))
+```
+
+
+
+## Ejercicios
+
+Haga las uniones entre los nacimientos de hijos, los padres  y sus fallecimientos. Luego cree los objetos de intervalo que corresponden a:
+
+- Intervalo que vivió antes de cada hijo
+
+- Intervalo de vida
+
+- Intervalo de vida de los hijos antes de la muerte del padre.
+
+- Intervalo de tiempo del menor hijo al mayor hijo.
+
+## Ejercicio, dificil:
+
+
+¿Cuantas personas tuvieron más de un hijo en un periodo de menos de 9 meses (~40 semanas)? ¿Qué implicaciones tiene esto para la vida de esa persona?
+
+_Sugerencia:_ Ordene las fechas de nacimiento por ID.
+

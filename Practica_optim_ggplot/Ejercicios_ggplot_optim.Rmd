@@ -54,7 +54,7 @@ Cree una lista que tenga las 6 optimizaciones del ejercicio anterior.
 3. Programe la siguiente función que reciba un vector $\mathbf{x}=(x_1,\dots,x_d)$ de $d$ dimensiones. 
 
 $$
-f(\mathbf{x}) = 1 - \Big(\sin^2(\pi w_i) + (w_d -1)^2[1+\sin^2(2\pi w_d)] + \sum_{i=1}^{d-1}[1 + 10\sin^2(\pi w_i + 1)] \Big)
+f(\mathbf{x}) = 1 - \Big(\sin^2(\pi w_1) + (w_d -1)^2[1+\sin^2(2\pi w_d)] + \sum_{i=1}^{d-1}\{[1 + 10\sin^2(\pi w_i + 1)](w_i -1)^2\} \Big)
 $$
 con,
 
