@@ -1,0 +1,175 @@
+\documentclass{article}
+\title{El titulo de mi documento}
+\author{Jorge Loria S.}
+\date{08-Nov-2017} % Que pasa si quita este comando?
+
+% Al inicio no incluir lo siguiente:
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+
+%% Los de matematica que no se incluyen al inicio
+\usepackage{amssymb}
+\usepackage{amsmath}
+
+% Definir un comando
+% \DeclareMathOperatori
+
+\begin{document}
+\maketitle
+
+Hola clase :) 
+% Corregir tildes\' , e incluir paquetes de español :D
+
+
+% \tableofcontents
+
+\begin{abstract}
+Este va a ser el resumen de un p\'arrafo que deben incluir al inicio del documento escrito que entreguen. Debe ser suficientemente claro para que se evidencie de qu\'e trata el tema que trabajaron, pero sin entrar en muchos detalles. Adem\'as debe incluir una (muy) breve explicaci\'on de los resultados.
+\end{abstract}
+
+\section{La primera secci\'on}
+
+Bueno, \LaTeX no es un procesador de texto como Word. Est\'a basado en la idea de que el dise\~no de los documentos debe dejarse a los dise\~nadores, y que el resto de nosotros los mortales escriban lo que quieran y que se vea as\'i de bonito :D 
+% \cite{PLatex}[] Incluir la cita y el inicio de thebibliography
+
+\subsection{Modo de Texto}
+Para comenzar con el modo de texto diay uno nada m\'as escribe de forma natural. Hay un par de comandos que ayudan a poder organizar mejor el texto: \textit{para la letra it\'alica}, \textbf{para la letra en negrita}, e incluso \underline{para subrayar el texto}. 
+
+Para comenzar un nuevo p\'arrafo se deja una linea entre el p\'arrafo anterior y el nuevo. Algunas veces es necesario poner algo entre comillas, intente usarlas. % esperar...	
+
+Al intentar usarlas da un resultado inesperado e "inc\'omodo". Para arreglar esto, se usan: ``backticks dobles (`) para comenzar, y para cerrar las comillas dobles". ?`Alguna pregunta? \newline
+Para comenzar una nueva linea se puede usar el comando newline\newline
+\begin{center}
+Para centrar el texto se usa el ambiente (begin) center
+\end{center}
+
+Algunas veces hay que usar una palabra como antig\"uedad. 
+
+\subsection{Modo de Matem\'atica}
+
+Hay 3 formas principales:
+% Incluir paquetes para varas de matemática.
+\begin{itemize}
+\item Se puede incluir entre el texto \$ envolviendo el texto  entre signos de dolar\$, $1+1 = \sum_{n=0}^{\infty}2^{-n}$
+
+\item También se puede incluir usando dos signos de d\'olar, pero esto lo incluye de una forma $$2^7 = 128$$ un poco inc\'omoda a ratos
+
+\item Se puede incluir usando \textit{align}:
+
+Seg\'un \cite{Kellison}[Kellison, p. 28] se tiene la identidad:
+
+\begin{align}
+	a(t) &= e^{\int_{0}^{t}\delta_r dr} & \\
+	&=\prod_{n=1}^{t}(1+i_n) & \text{si } i_n \text{es la tasa de inter\'es efectiva en el n-\'esimo periodo}
+\end{align}
+
+
+Si no se quiere que tenga los n\'umeros de ecuaci\'on se puede usar: 
+
+\begin{verbatim}
+\begin{align*}
+a(t) &= e^{\int_{0}^{t}\delta_r dr}
+\end{align*}
+\end{verbatim}
+
+\end{itemize}
+
+
+\subsubsection{Binomiales y fracciones}
+Para usar un coeficiente binomial se usa el comando binom\{\}\{\} e indicar cuales son los coeficientes, y se hace algo similar para las fracciones:
+\begin{align*}
+\binom{n}{m} = \frac{n!}{(n-m)!m!}
+\end{align*}
+
+%  \subsubsection{Crear un nuevo comando}
+\newcommand{\mIng}[1]{\int_{#1}^{\infty}}
+\newcommand{\mInt}{\mIng{0}}
+
+
+\subsubsection{Letras Griegas(y un par de funciones m\'as)}
+Hay muuuuuuchas letras griegas, si se quiere incluir una de estas en modo matem\'atico se usa \\ y luego el nombre. Si se quiere en may\'uscula se pone la primera letra del nombre en may\'uscula y el resto en min\'uscula. Para incluirlas se tiene que estar en modo matem\'atico:
+
+$$\lim_{\alpha \to 0}\mInt \big(\alpha\times \beta(\lambda,\alpha) \exp{(\delta_{2}\cos(\psi\varphi\times \phi\varOmega\Gamma(\lambda)))} d\lambda\big)$$
+
+Nueva relaci\'on:
+
+\[\exp{(2)} > e \]
+
+?`Alguna de las siguientes relaciones es cierta?
+\begin{align*}
+\binom{n}{m} &\leq \binom{n+1}{m}\\
+\binom{n-1}{m+1} & \geq \binom{n-2}{m+1}
+\end{align*}
+
+\section{Enumerar}
+
+\begin{enumerate}
+	\item La primera parte
+	\item La segunda, que viene con items:
+	\begin{itemize}
+		\item Dos punto uno
+		\item ?`Dos punto qu\'e?
+		\item \dots
+		\begin{itemize}
+			\item Esto se va a descontrol
+			\item aaaaaar!
+		\end{itemize}
+	\end{itemize}
+	\item La tercera, que viene con partes:
+	\begin{enumerate}
+		\item Ahora s\'i podemos seguir contando
+		\item Tercero punto 2
+		\item !`Genial!
+		\begin{enumerate}
+			\item ?`Seguimos?
+			\item !`S\'i!
+			\item ?`Paramos?
+			\item !`NO!
+		\end{enumerate}
+	\end{enumerate}
+\end{enumerate}
+
+\newpage
+Ok, ahora de vuelta a algo un poco m\'as aterrizado:
+
+\begin{itemize}
+	\item Este va bien
+\item[Etiqueta] Y una peque\~na definici\'on
+\item[Otra etiqueta] con otra peque\~na definici\'on.
+\end{itemize}
+
+
+\section{Tablas!}
+Para insertar tablas nuevas, se usa:
+
+%% Incluir el center al final, o sea despues de insertar la tabla.
+\begin{center}
+%% Hacer comparaci\'on sin y con los hline
+\begin{tabular}{|c|l|l|r|}
+	% Hacer comentario sobre la orientacion
+	\hline
+Primer Elemento! & Este & es el & t\'itulo \\ \hline\hline
+	                              0.1                                & 0.2  & 0.6   &        3 \\ \hline
+	                               7                                 & 8    & 16    &       79 \\ \hline
+\end{tabular}
+\end{center}
+
+
+En R hay un comando muy \'util que sirve para obtener vectores y matrices con un formato similar al anterior. Muchas veces requiere de un par de pruebas y errores para que funcione de forma correcta. Su nombre es ``cat''.
+
+\section*{Esta sección va sin número}
+Va sin n\'umero por el asterisco del final de section.
+
+% \includegraphics{Mi_grafico}
+
+
+
+%% Incluir tableofcontents al inicio
+
+\begin{thebibliography}{10}
+\bibitem{PLatex} The LaTeX Project  {\em An introduction to LaTeX} tomado de {https://www.latex-project.org/about/} el 7 de nov, del 2017.
+
+\bibitem{Kellison} Kellison, S.G. (1991), {\em The Theory of Interest}, Second Edition, Irwin
+\end{thebibliography}
+
+\end{document}
