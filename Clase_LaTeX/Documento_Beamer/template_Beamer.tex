@@ -1,0 +1,172 @@
+\documentclass{beamer}
+\usetheme{Frankfurt}%Default} % AnnArbor,
+%% No se incluye al inicio
+\usebeamercolor{seahorse}
+\usebeamerfont{serif}
+
+\title{Mi primera presentaci\'on de Beamer} % poner [Pres. Beamer] despues de hacer el cambio de tema
+\author{Jorge Lor\'ia}
+\date{Nov. 15, 2017}
+% Agregar despues del primer frame...
+\subtitle{Con su subtitulo}
+
+
+%% Agregar despues del primer frame
+\institute[UCR]{Universidad de Costa Rica}
+
+% Para mas temas, ver:
+%% http://deic.uab.es/~iblanes/beamer_gallery/
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+% Holaaaa, si quieren incluir mas palabras las pueden incluir aca
+\end{frame}
+
+
+%% Tabla de contenidos: incluir hasta el final
+\begin{frame}
+\frametitle{Tabla de Contenidos}
+\tableofcontents
+\end{frame}
+
+
+
+\section{Introducci\'on}
+
+\subsection{Primeras Diapositivas}
+
+
+\begin{frame}
+
+Ac\'a puedo comenzar a escribir libremente. Si quiero comenzar una nueva diapositiva, vuelvo a usar el begin frame
+\end{frame}
+
+\begin{frame}
+\frametitle{El mejor titulo} % puedo poner titulos en las diapositivas
+Con las mejores palabras.
+Con los mejores estudiantes $<3$ (no se lo crean). Note que ac\'a tampoco se pas\'o de linea. \newline Pero ac\'a s\'i. 
+
+Los comandos de \LaTeX funcionan de una forma muy similar en Beamer a como funcionan en un art\'iculo.
+
+Note que la secci\'on en este tema, no se ve. Si se cambia por AnnArbor, se puede ver 
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Im\'agenes!!}
+La siguiente imagen funcionar\'ia en un art\'iculo y en una presentaci\'on de Beamer:
+\begin{figure}
+	%plot(x = 1:20,
+	% 	y = exp(1:20/10 + 5),
+	% 	type = 'l',
+	% 	main = 'Mi grafico 1',
+	% 	xlab = 'Eje X',
+	% 	ylab = 'Eje Y')
+	\includegraphics[scale=0.3]{Mi_grafico_1}
+	\caption{Mi primera imagen}
+	%% Esto tambien funciona en documentos de Latex normales
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Atenci\'on!}
+Muchas veces cuando uno da una presentaci\'on quiere llamar la \alert{atenci\'on}. Pero hay que tener cuidado de no abusar de esto. Adem\'as, se puede hacer letra \textit{it\'alica} como en un art\'iculo, o en \textbf{negrita}.
+
+\begin{alertblock}{Esto es realmente importante}
+Ac\'a deber\'ia venir algo \textbf{DEMASIADO} importante
+\end{alertblock}
+
+\begin{examples}
+Pero ac\'a solo debe venir un ejemplo
+\end{examples}
+
+\end{frame}
+
+
+
+
+\section{Modo matem\'atico}
+\begin{frame}
+\frametitle{Primera ecuacion(en Beamer..!)}
+\begin{align*}
+1 + 1 &= \sum_{n=0}^{\infty}2^{-n}\\
+1 + \exp(0) &= \sum_{n=0}^{\infty}\frac{1}{(1+1)^{n}}\\ 
+\end{align*}
+\end{frame}
+
+\begin{frame}
+Un resultado muy importante, que se suele usar desde los primeros cursos de matem\'atica es:
+\begin{block}{Teorema del binomio}
+Para $x \in \mathbb{R}$, $n \in \mathbb{N}$, se tiene que:
+\begin{align}
+(1+x)^n = \sum_{m=0}^{n}\binom{n}{m}x^m
+\end{align}
+\end{block}
+\end{frame}
+
+\begin{frame}
+Tambien se pueden hacer bloques sin poner t\'itulos:
+\begin{block}{}
+	Entonces ac\'a puede venir una peque\~na aclaraci\'on al respecto. Y que se vea como un cuadrito bien bonito.
+\end{block}
+Para luego seguir escribiendo, y comentando algo al respecto.
+\end{frame}
+
+\section{Pausas!}
+\begin{frame}
+Se puede pausar durante el texto \pause como as\'i, entonces esto sale como si estuviera en otra diapositiva. \pause Esto obviamente genera complicaciones si se quieren imprimir las diapositivas. \pause Pues nadie quiere tener diapositivas incompletas.
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Listas con pausas}
+Algo usual es poner pausas en las listas:\pause
+\begin{itemize}
+\item Primer item\pause
+\item Segundo item\pause
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Listas con m\'as pausas}
+Si se tienen listas muy largas puede ser inc\'omodo poner tantas veces el comando de pause. Entonces, se puede poner:
+% Si se quiere evitar que el uno salga solo, se pone un \pause ac\'a
+\begin{itemize}[<+->]
+	\item Uno
+	\item Dosssss
+	\item Tres
+	\item Cuatro
+	\item Algo
+	\item Sigue...
+	\item \dots
+	\item Sesenta y cuatro
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Decidiendo el orden lml}
+Se tiene la primera linea
+\begin{itemize}
+\item<3-> Tercero
+\item<2-> Segundo
+\item<4> Cuarto que desaparece
+\item<5-> Quinto que se queda
+\item<6-> Sexto!
+\item Tambi\'en podr\'ia funcionar con un enumerate
+\item<3-> Uno que aparezca con el tres :D
+\end{itemize}
+
+\pause[7] Y bueno, as\'i se puede seguir... \pause[4] Pero hay que tener cuidado con el n\'umero de la pausa
+\end{frame}
+
+\begin{frame}{}
+
+{\Large Pasemos a R :)}
+
+\end{frame}
+
+
+
+\end{document}
