@@ -1,7 +1,7 @@
 ---
 title: "Intro a R (Studio)"
 author: "Jorge Loría"
-date: "Sept 4, 2017"
+date: ""
 output: beamer_presentation
 incremental:  TRUE
 ---
@@ -109,7 +109,7 @@ knitr::kable(m1)
 
 
 ## Intro a vectores
-Para definir un vector, se usan los símbolos: c(), y adentro se ponen sus elementos separados por comas: 
+Para definir un vector, se usan los símbolos: `c()`, y adentro se ponen sus elementos separados por comas: 
 \pause
 
 <!------ el nombre de los vectores, viene de usar la "c" de combine -------->
@@ -201,7 +201,7 @@ Una de las mayores fortalezas de los lenguajes vectoriales es que las operacione
 ```{r,results=FALSE}
 700*c(1,2,5,8)
 2^c(-2,7,3,10)
-(1/2)^c(-2,7,3,10)
+(9/10)^c(-2,7,3,10)
 ```
 <!---------Ojo el toque para que salgan separados y bonitos --->
 \pause
@@ -294,7 +294,7 @@ Las listas pueden tener nombres para sus elementos:
 ```{r}
 l2<- list(Nombre = c('Jorge','Loria'),
           Cedula = '1-1624-0508', 
-          Casillero = 20, 
+          Casillero = 111, 
           lista_anterior = l1)
 ```
 
@@ -324,9 +324,9 @@ Algunas veces los contenidos de las estructuras multidimensionales pueden ser un
 También se pueden asignar nuevos elementos a una lista:
 
 ```{r}
-l2$Horario <- list(Lunes = 9:11,
-                   Miercoles = 1:4)
-l2$Edad <- 2017 - 1995
+l2$Horario <- list(Lunes = 13:15,
+                   Jueves = 9:12)
+l2$Edad <- 2018 - 1995
 ```
 
 \pause
@@ -335,12 +335,12 @@ Ahora, llame de nuevo `str(l2)`
 
 Si cambia elementos de una lista, se pierde el valor anterior
 ```{r}
-l2$Edad <- 2017-1995 - 1 
+l2$Edad <- 2018-1995 - 1 
 ```
 
 ## `purrr`
 
-Hay una librería dedicada al manejo _bonito_ de las listas, que posiblemente vamos a ver más adelante en el curso.
+Hay una librería dedicada al manejo _bonito_ de las listas que se llama _purrr_, que no tenemos oportunidad de estudiar en el curso. Pero es tremendamente útil :) <!--- , que posiblemente vamos a ver más adelante en el curso. ---->
 
 ## Matrices
 
@@ -360,14 +360,14 @@ Para crear la matriz, se pueden utilizar varias entradas opcionales. Que son: _b
 Sabiendo esto, cree la siguiente matrix:
 
 ```{r,echo=FALSE}
-mi_matriz4 <- matrix(c(1.7,6,12,6,781.05,15,101,-140,-0.05,750),byrow = TRUE,ncol = 5)
+mi_matriz4 <- matrix(c(1.7,6,12,6,101,-140,-0.05,750),byrow = TRUE,ncol = 4)
 mi_matriz4
 ```
 
 \pause
 
 Repita lo anterior, pero aumente ncol/nrow por un número. <!--Vea el error que obtiene.-->
-<!----matrix(c(1.7,6,12,6,781.05,15,101,-140,-0.05,750),byrow = TRUE,ncol = 6) -->
+<!----matrix(c(1.7,6,12,6,101,-140,-0.05,750),byrow = TRUE,ncol = 5) -->
 
 
 ## 
@@ -375,7 +375,7 @@ También se pueden hacer matrices de strings, de elementos lógicos o de número
 
 
 ```{r,results=FALSE}
-mi_matriz1 <- matrix(c('Hola','Que','HAce','Hoy'),
+mi_matriz1 <- matrix(c('Hola','Que','Hace','Hoy'),
                      nrow = 2,byrow= T)
 mi_matriz2 <- matrix(c(TRUE,FALSE,TRUE,TRUE,TRUE,FALSE,
          FALSE,TRUE,FALSE,FALSE,TRUE,TRUE),
