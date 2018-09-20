@@ -123,7 +123,7 @@ falta(a = 3,b = 2)
 
 \pause
 
-Sin embargo, si se intenta llamar declarando `b = 2`, sin declarar un valor para `a`, sí va a tirar error. \pause R tira error hasta que se topa que ocupa la variable.
+Sin embargo, si se intenta llamar declarando `b = 2`, sin declarar un valor para `a`, sí va a tirar error. \pause R tira error en el momento que se percata que ocupa la variable.
 
 ## Parámetros pre-definidos
 
@@ -254,6 +254,76 @@ fun2()
 \pause
 
 ¿Qué se obtiene como body de `fun2`? formals? Y si se llama sin ponerle los paréntesis?
+
+## Funciones con parámetros como resultado de otra función
+
+Se pueden crear funciones que creen funciones evaluadas en ciertos parámetros, y que luego se puedan evaluar en una variable particular:
+
+```{r}
+lineal <- function(a,b){
+  function(x){
+    a*x+b
+  }
+}
+```
+
+\pause
+
+```{r}
+recta_1 <- lineal(-1,3)
+```
+
+\pause
+
+```{r}
+recta_1(7)
+```
+
+
+## Ejercicio
+
+Programe una funcion que evalúe en los parámetros: $\{\beta_0,\beta_1,\beta_2,\eta_1\}$ (que recibe como vector), y retorne la siguiente función
+
+$$
+Nels(m) = \beta_0 + \beta_1\exp(-m/\eta_1) + \beta_2\exp(-m/\eta_1)
+$$
+
+\pause
+
+```{r}
+Crea_Nels <- function(parametros){
+  beta0 <- parametros[1]
+  beta1 <- parametros[2]
+  beta2 <- parametros[3]
+  eta1 <- parametros[4]
+  function(m){
+    exp_eta1 <- exp(-m/eta1)
+    beta0 + beta1*exp_eta1 + beta2*exp_eta1
+  }
+}
+```
+
+
+## Ejercicio
+
+Se usa así:
+
+```{r}
+Nels <- Crea_Nels(c(0.02,0.05,-0.06,1.4))
+Nels(3)
+```
+
+\pause
+
+¿Cuál es el `environment` de la función `Nels`?
+
+\pause
+
+```{r}
+environment(Nels)
+```
+
+¿Qué pasa si se modifica eta1 (como variable)? \pause ¿Sufre alguna modificación `Nels` si se llama `Crea_Nels` otra vez?
 
 ## Funciones como parámetro:
 
@@ -543,11 +613,11 @@ mi_iterador(seq(from = 12, to = 1400,by = 347))
 
 ## Ejercicio
 
-Ajuste la función que hizo al principio de la clase, de forma tal que si recibe un _n_ mayor a la longitud del vector que se tiene, devuelva un valor de 0.
+Ajuste la función que hizo de `montosVP`, de forma tal que si recibe un _n_ mayor a la longitud del vector que se tiene, devuelva un valor de 0.
 
 \pause
 
-Para realmente terminar de apreciar el valor de las funciones vectoriales, repita la función, pero esta vez utilizando un `for`.
+Para realmente terminar de apreciar el valor de las funciones vectoriales, programe la misma función, pero esta vez utilizando un `for`.
 
 
 <!-----
@@ -575,9 +645,9 @@ Estas funciones modifican uno de sus argumentos, y le _reemplazan_ el valor de a
 
 \pause
 ```{r}
-v1 <- 1:15
+v1 <- 1:12
 names(v1)
-names(v1) <- letters[1:15]
+names(v1) <- letters[1:12] # las primeras 12 letras
 ```
 
 \pause
@@ -667,7 +737,7 @@ switch('A',B = 'Valor B',A = 'Valor A',C = 'Valor C')
 
 ## Switch con funciones:
 
-Los switch, esperan devolvr un objeto, el cual puede ser una función, por lo que luego se puede operar sobre este:
+Los switch, esperan devolver un objeto, el cual puede ser una función, por lo que luego se puede operar sobre este:
 
 ```{r}
 switch('X',X = mean,Y = sum,Z = max)(1:15)
