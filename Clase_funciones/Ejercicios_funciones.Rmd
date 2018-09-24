@@ -1,0 +1,106 @@
+---
+title: "Práctica funciones"
+author: "Jorge Loría"
+date: ""
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Ejercicios funciones
+
+ 1. Programar una funcion que reciba un vector con al menos 5 parámetros de una, y retorne la función $D(0,T)$ dada por la siguiente fórmula, donde $T$ es el parámetro que debe recibir la función que crea.
+ 
+ 
+ \begin{align*}
+ \delta(t|\beta_0,\beta_1,\beta_2,\beta_3,\eta_1,\eta_2) = \beta_0 &+ \beta_1\bigg(\frac{1-\exp(-t/\eta_1)}{t/\eta_1} \bigg)+ \beta_2\bigg(\frac{1-\exp(-t/\eta_1)}{t/\eta_1} - \exp(-t/\eta_1) \bigg)\\  
+ &+ \beta_3\bigg(\frac{1-\exp(-t/\eta_2)}{t/\eta_2} - \exp(-t/\eta_2) \bigg)\\
+ D(0,T) = \exp(-\delta(T)T)
+ \end{align*}
+ 
+ 2. Programe una función que reciba dos vectores del mismo tamaño (`a`,`b`) y un valor `x`, con el vector `a` ordenado de menor a mayor. Y que retorne el valor que tomaría $f(x) = mx+c$, donde la pendiente y el intercepto los calcula usando los $a_i \leq x < a_{i +1}$ , y los respectivos puntos $b_i,b_{i+1}$, con $(a_i,b_i)$ y $(a_{i+1},b_{i+1})$. A esta técnica se le llama interpolación lineal.
+   + Ejecute la función usando `a = 1:10`,`b = c(7,15,23,28,-7,98,65,96,52,102.3)`, y pruebe usando `x = 4/3`, `x = 3.1468`, `x = 8.7245`,`x = 999/110`. 
+   + ¿Qué sucede si manda en el parámetro $x$ un vector? ¿Funciona de forma _correcta_?
+
+ 3. Programe una función que reciba un entero $N$, y que retorne una matriz de $N\times N$, donde la diagonal sea llena de unos, y tal que en la entrada $i,j$ corresponda el número $|i-j| + 1$.
+
+ 4. De qué forma escribiría el siguiente código de una forma más usual: 
+ 
+```{r,eval=FALSE}
+`+`(1, `*`(2,`^`(3,`/`(4,2))))
+```
+ 
+
+ 5. Programe las siguientes funciones:
+ 
+ + Donde $D+1$ es la dimensión del vector que recibe la función:
+ 
+\begin{align*}
+f_1(x) = \sum_{i=1}^D e^{-0.2}\sqrt{x_i^2 + x_{i+1}^2} + 3(\cos(2x_i) + \sin(2x_{i+1}))
+\end{align*}
+
+ + Donde $n$ es la longitud del vector $x = (x_1,x_2,\dots,x_n)$:
+ 
+ \begin{align*}
+  f_2(x) = \prod_{i=1}^n \sqrt{x_i}\sin(x_i)
+ \end{align*}
+ 
+ ¿Qué condición le ocupa pedir a $x_i$ para que siempre esté bien definido? En caso de que alguna entrada se escape de su dominio máximo, haga que la función devuelva `NA`, usando el comando `return(NA)`. Sugerencia: busque `any`.
+
+ + Defina $t_i = 0.1i$, $y_i = e^{-t_i} - 5e^{10t_i}$. Y sea $f_3:[0,20]^2 \to\mathbb{R}$
+ 
+ \begin{align*}
+ f_3(x_1,x_2) = \sum_{i=1}^{10}\bigg(e^{-t_i x_1} - 5e^{-t_i x_2} - y_i\bigg)^2 
+ \end{align*}
+ 
+ + Defina $g(x,y) = (x^2)^{y^2 +1} + (y^2)^{x^2 +1}$, llamando esta función, defina:
+ 
+ \begin{align*}
+ f_4(x) = \sum_{i=1}^{n-1} g(x_i,x_{i+1})
+ \end{align*}
+ 
+ 
+ + Para esta función ocupa definir las siguientes _normas_, que son funciones que reciben un vector. Para la primera, puede programar una función que reciba un parámetro $p\geq 1$ y retorne la primera función:
+ 
+ \begin{align*}
+ ||x||_p = (\sum_{i=1}^n x_i^p)^{1/p}
+ ||x||_{\infty} = \max(|x_i|)
+ \end{align*}
+ 
+ La función que debe programar ahora, va a recibir un vector y otro parámetro, que puede ser de tipo caracter o numérico, en caso de que este segundo parámetro sea igual a `"infinito"`, debe usar el caso $p=\infty$
+ 
+ \begin{align*}
+ f(x,p) = 1 + \cos(||x||_p) + \sin(||x||_q) + \log(||x||_p + ||x||_q)
+ \end{align*}
+ 
+ Donde $q$ cumple que: $\frac{1}{p} + \frac{1}{q} = 1$.
+ 
+ 6. Defina una función _infix_ como las que trabajamos que clase, que reciba dos parámetros. Y que si el primero es mayor que el segundo al cuadrado más el seno de $0.97$, entonces que devuelva el segundo.
+
+ 7. ¿Qué hace la siguiente función? Plantee una hipótesis antes de ejecutarla
+ 
+```{r,eval=FALSE}
+f <- function(x) {
+  f <- function(x) {
+    f <- function(x) {
+      x ^ 3
+    }
+    f(x) + 7
+  }
+  f(x) * 1.5
+}
+f(5)
+```
+ 
+ 8. Cree un operador _infix_ que reciba dos vectores y devuelva la unión de ellos, en caso de que tengan elementos en común solo deben aparecer una vez. (_Sugerencia:_ busque la función `unique`).
+ 
+ 9. Cree un operador _infix_ que reciba dos vectores y devuelva la concatenacion de ellos. Es decir, si recibe `a = c(15,23,27), b = c(62,27,38,5)` retornaría `c(15,23,27,62,27,38,5)`. (_Sugerencia:_ recuerde que los vectores **siempre** son unidimensionales).
+ 
+ 10. Programe una función $beta(X,y)$ que reciba una matriz $X$ de dimensiones $n\times p$, un vector $y$ con $n$ entradas, y retorne $(X'X)^{-1}X'y$, donde $X'$ es la transpuesta de $X$. Además, programe otra función $errr(X,y)$ que retorne $y - X beta  (X,y)$. Programe otra función que calcule $||errr(X,y)||_2$, usando la definición de norma del último inciso del ejercicio 5.
+
+ 
+ 
+ 
