@@ -1,7 +1,7 @@
 ---
 title: "Dataframes"
 author: "Jorge Loría"
-date: "Sept 18, 2017"
+date: ""
 output: beamer_presentation
 classoption: aspectratio=169
 ---
@@ -138,7 +138,7 @@ y <- factor(c(1,3,1,4,1,2,6,5))
 y
 ```
 
-## Con los números es **más** molesto
+## Con los enteros es **más** molesto
 
 Pues los niveles que se asignan no necesariamente coinciden con los que realmente toman:
 
@@ -147,6 +147,55 @@ y
 levels(y)
 ```
 
+Si intentamos que lo interprete como numérico:
+
+```{r}
+as.numeric(y)
+```
+
+## Con los números es _aún_ **más** molesto
+
+```{r}
+z1 <- factor(c(0.7,1.9,15.6,1.4))
+z1
+```
+\pause
+```{r}
+levels(z1)
+as.numeric(z1)
+```
+
+\pause
+```{r}
+as.numeric(levels(z1))
+```
+
+## Solución:
+
+\pause
+
+```{r}
+as.numeric(levels(z1))[z1]
+```
+
+\pause
+¿Cómo harían para hacer el llamado anterior usando `%>%`?
+\pause
+
+```{r}
+library(magrittr)
+z1 %>% 
+  levels() %>% 
+  as.numeric() %>% 
+  `[`(z1)
+```
+
+\pause
+También se puede hacer:
+
+```{r,eval=FALSE}
+z1 %>% as.character() %>% as.numeric()
+```
 
 ## Pausa de _factors_
 
@@ -472,7 +521,8 @@ personas %>% select(Primer_Nombre = Nombre, Primer_Apellido = Apellido,everythin
 O, se puede usar la función `rename`:
 
 ```{r}
-personas %>% rename(Primer_Nombre = Nombre, Primer_Apellido = Apellido)
+personas %>% rename(Primer_Nombre = Nombre, Primer_Apellido = Apellido) %>% 
+  select(-Asegurado)
 ```
 
 \pause
@@ -518,7 +568,8 @@ También se pueden agregar columnas completamente nuevas con `mutate`, pero hay 
 
 ```{r}
 personas %>% 
-  mutate(Bachillerato_en = c('Farmacia','Nutrición','Actuariales','Economia'),
+  mutate(Bachillerato_en = c('Farmacia','Nutrición' ,
+                             'Actuariales','Economia'),
          Hijos = c(FALSE,TRUE,FALSE,TRUE)) %>%
   select(-(Edad:Antiguedad)) # tambien puedo eliminar columnas con rangos
 ```
@@ -567,13 +618,13 @@ personas %>% mutate(Media_edad = mean(Edad),
 
 Por este tipo de funciones es que arrange es _taaaaan_ útil. 
 
-\pause Usando `arrange` y `mutate` indique cuanto es la diferencia entre las personas con la edad menor. 
+>- Usando `arrange` y `mutate` indique cuanto es la diferencia de edades con la menor edad. 
 
-\pause Combinando `filter` y `mutate` indique cuantas personas hay casadas.
+>- Combinando `filter` y `mutate` indique cuantas personas hay casadas.
 
-\pause Repita lo anterior, pero con la cantidad de personas que tienen sexo `'M'`
+>- Repita lo anterior, pero con la cantidad de personas que tienen sexo `'M'`
 
-
+>- Si ordena por edad y pega el último nombre con el primer apellido, ¿cuál sería el nombre completo?
 
 ## `transmute`
 
@@ -593,15 +644,15 @@ personas %>%
 Todas las funciones que devuelvan un vector con la misma (o menor a) cantidad de entradas de las que reciban* se pueden aplicar usando un `mutate`. Entre estas, están la mayoria de las de funciones de utilidad de la primera presentación, y:
 \pause
 
-|	función	  |	resultado               |
-|------------:|-----------              |
-|    `lag`      | la entrada anterior     |
-|    `lead`     | la entrada siguiente    |
-| `cummean`     |	media acumulada         |
-| `cummin`  	  | minimo acumulado        |
-| `row_number`  | numero de fila          |
+|	función	      |	resultado             |
+|--------------:|-----------------------|
+|    `lag`      | la entrada anterior   |
+|    `lead`     | la entrada siguiente  |
+| `cummean`     |	media acumulada       |
+| `cummin`  	  | minimo acumulado      |
+| `row_number`  | numero de fila        |
 | `ntile`       | agrupa en `n` cajas		| 
-
+| `case_when`   | ifelse general        |
 
 
 ## `summarise` 
@@ -702,8 +753,7 @@ Repita el ejercicio, pero conservando las provincias que tengan como edad mínim
 Esta función permite aplicar funciones fila por fila, sin tener interacción entre filas. Es particularmente útil cuando se trabaja con funciones propias, las cuales resumen la información que se está trabajando, pero se van a tener resultados distintos para cada fila.
 
 
+## Próximamente:
 
-## Proximamente:
 
-
-x_joins :)
+Uniones de tablas :)
