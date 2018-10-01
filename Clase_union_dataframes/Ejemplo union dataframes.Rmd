@@ -1,0 +1,44 @@
+---
+title: "Datos Unión Dataframes"
+author: "Jorge Loría"
+date: ""
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Datos
+
+
+Vamos a ocupar los siguientes datos para el desarrollo de la lección de Unión de Dataframes
+
+Para la primera parte:
+```{r,eval=FALSE}
+library(dplyr)
+x1 <- tibble(nombre = c('a','b','c','a'), 
+                 valor_x = c('x1','x2','x3','x4'))
+
+y1 <- tibble(nombre = c('a','b','d','b'),
+                 valor_y = c('y1','y2','y3','y5'))
+```
+
+Los objetos tipo `tibble` son como dataframes, pero tienen ciertas diferencias que los hacen un poco más amigables a la hora de manejarlos, como que no convierten los strings en factors,
+
+Para la segunda parte:
+
+
+```{r,eval=FALSE}
+y2 <- y1 %>% 
+  rename('Otro_nombre' = 'nombre')
+
+x2 <- tibble(Otro_nombre = c('a','b','c','a'),
+                 Otro_valor_x = c('x1','x2','x3','x2'),
+                 nuevo_valor = c(15.7,7.46,6.19,8.80))
+
+y3 <- tibble(nombre = c('a', 'b','d','a'),
+                 valor_y = c('3y1','3y2','3y3','3y4'))
+```
+
+
