@@ -1,7 +1,7 @@
 ---
 title: "Unir tablas"
 author: "Jorge Loría"
-date: "Sept 25, 2017"
+date: ""
 output: beamer_presentation
 ---
 
@@ -26,12 +26,11 @@ Vamos a ocupar las siguientes tablas para hacer los ejemplos de esta clase:
 
 ```{r,warning=FALSE,message=FALSE}
 library(dplyr)
-x1 <- data.frame(nombre = c('a','b','c','a'),
-                 valor_x = c('x1','x2','x3','x4'),
-                 stringsAsFactors = FALSE)
-y1 <- data.frame(nombre = c('a','b','d','b'),
-                 valor_y = c('y1','y2','y3','y5'),
-                 stringsAsFactors = FALSE)
+x1 <- tibble(nombre = c('a','b','c','a'), 
+                 valor_x = c('x1','x2','x3','x4'))
+# es como un dataframe, pero no hace los strings en factor
+y1 <- tibble(nombre = c('a','b','d','b'),
+                 valor_y = c('y1','y2','y3','y5'))
 ```
 
 
@@ -42,20 +41,18 @@ y1 <- data.frame(nombre = c('a','b','d','b'),
 y2 <- y1 %>% 
   rename('Otro_nombre' = 'nombre')
 
-x2 <- data.frame(Otro_nombre = c('a','b','c','a'),
+x2 <- tibble(Otro_nombre = c('a','b','c','a'),
                  Otro_valor_x = c('x1','x2','x3','x2'),
-                 nuevo_valor = c(15.7,7.46,6.19,8.80),
-                 stringsAsFactors = FALSE)
+                 nuevo_valor = c(15.7,7.46,6.19,8.80))
 
-y3 <- data.frame(nombre = c('a', 'b','d','a'),
-                 valor_y = c('3y1','3y2','3y3','3y4'),
-                 stringsAsFactors = FALSE)
+y3 <- tibble(nombre = c('a', 'b','d','a'),
+                 valor_y = c('3y1','3y2','3y3','3y4'))
 ```
 
 
 ## `*_join`
 
-Hay 6 tipos de `join`, los cuales se parecen mucho entre sí. La gran diferencia es a *cual* de las tablas se le va a dar prioridad para conservar observaciones. Lo que se busca hacer con los `join` es obtener información que se tiene en otra tabla para poder realizar operaciones con variables de ambas tablas.
+Hay 6 tipos de `join`, los cuales se parecen mucho entre sí. La gran diferencia es a *cual* de las tablas se le da prioridad para conservar observaciones. Lo que se busca hacer con los `join` es obtener información que se tiene en otra tabla para poder realizar operaciones con variables de ambas tablas.
 
 \pause
 
@@ -75,7 +72,7 @@ Los primeros cuatro son para aumentar la cantidad de variables (como `mutate`). 
 
 ## `left_join`
 
-Esta función busca en las columnas del primer argumento (`x1`) que se indiquen (con el parámetro `by = 'nombre'`) cuales observaciones tienen coincidencias en la segunda tabla (`y1`) en la misma columna.
+Esta función busca en las columnas del primer argumento (`x1`) que se indiquen (con el parámetro `by = 'nombre'`) cuales observaciones tienen coincidencias en la segunda tabla (`y1`) en la columna `'nombre'` y agrega las columnas del segundo argumento usando como referencia las filas donde hubo coincidencis en la primera tabla.
 
 
 \pause
@@ -91,8 +88,7 @@ left_join(x1,y1,by = 'nombre')
 En general, muchas veces **no** hay datos para todas las observaciones, por lo que se puede poner `NA` para estos casos. Que representa "not available", o sea: "no disponible". \pause Dependiendo de las circunstancias y la naturaleza de los datos estos se pueden tratar de varias formas, muchas de las funciones base tiene el parámetro `na.rm` que viene pre definido como `FALSE`, si se le llama con `na.rm = FALSE` se omite ese valor a la hora de realizar el llamado. \pause Los valores `NA` pueden estar en cualquier clase de vectores: lógicos, enteros, numéricos y caracteres.  \pause En general las funciones al recibir un `NA` van a devolver un `NA`, incluso las comparaciones: `NA == 1`, `NA == TRUE`, `NA == 'Hola'` y `NA == NA`. \pause Para este último caso, existe una función que se llama `is.na` que indica si el valor es `NA` o no, y se puede combiar con `ifelse` para hacer cambios sobre estos.
 
 \pause
-
-Calcule la media del vector `seq(-120,30,by = 15)/(2*(-8:2))`, primero usando `na.rm = TRUE` y luego usando `na.rm = FALSE`.
+Defina `v1 <- seq(-120,30,by = 15)/ (exp(-8:2)-1)` y calcule su media usando la función `mean` <!--`seq(-120,30,by = 15)/(2*(-8:2))`-->, primero usando `na.rm = TRUE` y luego usando `na.rm = FALSE` .
 
 
 ## `right_join`
@@ -136,7 +132,7 @@ Con esta se tiene certeza de que no se van a tener `NA` nuevos por el `join`. \p
 
 \pause
 
-Conserva todas las observaciones del primer argumento que tienen al menos una coincidencia en el segundo argumento.
+Conserva todas las observaciones del primer argumento que tienen al menos una coincidencia en el segundo argumento y no agrega las columnas de la primera tabla
 
 ```{r}
 semi_join(x1,y1,by = 'nombre')
@@ -144,7 +140,7 @@ semi_join(x1,y1,by = 'nombre')
 
 
 \pause
-Con esta se tiene la misma garantía que la que se tiene con el `inner_join`. \pause ¿Porqué? \pause ¿Como podría hacer lo mismo pero usando otro tipo de  `join`?  
+Con esta se tiene la misma garantía que la que se tiene con el `inner_join`. \pause ¿Porqué? \pause ¿Como podría hacer lo mismo pero usando otro tipo de  `*_join`?
 
 ## `anti_join`
 
@@ -164,8 +160,6 @@ anti_join(x1,y1,by = 'nombre')
 ¿Se puede garantizar lo mismo que con los `join` anteriores? \pause
 
 ¿Como puede replicar este `join` usando otros tipos de `*_join`?
-
-
 
 <!------------
 ## `by = `
@@ -245,7 +239,7 @@ Note que ahora se obtienen 4 observaciones con `nombre = 'a'`.
 
 ## `bind_*`
 
-Estas funciones unen (pegan) data.frames en un sentido más literal que el que se usa para el join. Hay dos funciones de `bind_*`: `bind_cols` que pega **columnas** nuevas, y `bind_rows` que pega **filas** nuevas:
+Estas funciones unen (pegan) data.frames en un sentido más literal que el que hemos usado para el join. Hay dos funciones de `bind_*`: `bind_cols` que pega **columnas** nuevas, y `bind_rows` que pega **filas** nuevas:
 
 \pause
 
@@ -289,7 +283,7 @@ x1 %>% bind_rows(y3)
 Se puede incluir el parámetro `.id` para identificar a cual tabla pertenecen las filas que se obtienen:
 
 ```{r}
-y1 %>% bind_rows(y3,.id = 'id')
+y1 %>% bind_rows(y3,.id = 'Num_Tabla')
 ```
 
 
@@ -313,7 +307,7 @@ Algunas veces hay que completar _a pata_ los datos que se tienen, o se quieren o
 
 \pause
 ```{r}
-expand.grid(Anno = 2017:2018,
+expand.grid(Anno = 2018:2019,
             Nombre = c('Pablo','Ana'))
 ```
 
@@ -330,26 +324,32 @@ expand.grid(Anno = 2017:2018,Mes = 1:3,
             Nombre = c('Pablo','Ana'),stringsAsFactors = FALSE)
 ```
 
+## `crossing`
+También se puede usar la función `crossing` que viene en el paquete `tidyr`:
+
+```{r}
+library(tidyr)
+crossing(Anno = 2018:2019,
+            Nombre = c('Pablo','Ana'))
+```
+
+## Próximamente:
 
 
+`tidyr` :)
 
 ## Ejercicio
 
-Complete la tabla de salarios que se usó la clase anterior, puede apoyarse en las funciones `expand.grid`, `bind_*`, y `unique` para obtener todos los nombres de la tabla.
+Complete la tabla de salarios que se usó la clase anterior, puede apoyarse en las funciones `expand.grid` o `crossing`, `bind_*`, y `unique` para obtener todos los nombres de la tabla.
 
 \pause
 
-Termine los ejercicios que se trabajaron el lunes, si ve la oportunidad de usar lo que vimos en la clase de hoy, hágalo.
+Termine los ejercicios que se trabajaron la clase anterior, si ve la oportunidad de usar lo que vimos en la clase de hoy, hágalo.
 
 \pause
 
 `bind_rows`
 
-
-## Próximamente:
-
-
-tidyr :)
 
 
 
