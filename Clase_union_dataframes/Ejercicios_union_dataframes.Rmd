@@ -1,7 +1,7 @@
 ---
 title: "Ejercicios join"
 author: "Jorge Loría"
-date: "Oct 2, 2017"
+date: ""
 output: html_document
 ---
 
@@ -13,45 +13,45 @@ knitr::opts_chunk$set(echo = TRUE)
 
 La tabla de Gastos que se le envió, tiene 4 columnas, dos para indicar la fecha (Anno, y Mes), una que indica el Nombre de la persona, y otra que indica el monto de Gasto que realizó la persona en esa fecha. A diferencia de los datos que se usaron la semana pasada, estos tienen todas las observaciones, es decir todos los meses todas las personas tienen un monto de Gasto.
 
-Usando los datos de Gastos y los de salario que se usaron para la clase de ejercicios de dataframes, responda las siguientes preguntas. Donde lo ocupe, asuma una tasa de interés del 5.7%, y lleve los montos al inicio del 2017.
+Usando los datos de Gastos y los de salario que se usaron para la clase de ejercicios de dataframes, responda las siguientes preguntas. Donde lo ocupe, asuma una tasa de interés del 5.7%, y lleve los montos al inicio del 2018. Para cargar la tabla de Gastos, use la función `read_csv2`, que viene del paquete `readr`. Debe recibir la dirección del archivo. Para indicar la ruta del archivo, debe usar, `/` en lugar de `\`, o bien podría usar `\\`. Esto pues, el caracter `\` sirve para indicar expresiones regulares (ver `?regexp`).
 
 
-- Utilice la función de `anti_join`, identifique cuales son los meses en que se tienen gastos pero no se tiene salarios. Calcule en valor presente del 2017 cuanto se gasta en esos meses, usando una tasa de interés de 5% anual (conviértala).
+ 1. Utilice la función de `anti_join`, identifique cuales son los meses en que se tienen gastos pero no se tiene salarios. Calcule en valor presente del 2018 cuanto se gasta en esos meses, usando una tasa de interés de 5% anual (conviértala).
 
-- Identifique la cantidad de dinero que les _sobra_ a las personas cada mes, únicamente en los meses en que sí tienen salario. Luego, suponiendo que lo ahorran cada mes, y la tasa de interés **mensual** es de 2%, calcule cuanto dinero ahorraría cada persona para diciembre del 2021.
+ 2. Identifique la cantidad de dinero que les _sobra_ a las personas cada mes, únicamente en los meses en que sí tienen salario. Luego, suponiendo que lo ahorran cada mes, y la tasa de interés **mensual** es de 2%, calcule cuanto dinero ahorraría cada persona para diciembre del 2022.
 
-- Usando las tablas de los dos incisos anteriores indique ¿cuánto dinero tienen en diciembre del 2021 tomando en cuenta todos los meses?
+ 3. Usando las tablas de los dos incisos anteriores indique ¿cuánto dinero tienen en diciembre del 2021 tomando en cuenta todos los meses?
 
-- Si los gastos incluyen siempre un 13% de impuestos de ventas, ¿cuánto gastarían las personas en cada mes si los impuestos fueran del 14%?
+ 4. Si los gastos incluyen siempre un 13% de impuestos de ventas, ¿cuánto gastarían las personas en cada mes si los impuestos fueran del 14%?
 
-- Repita el primer inciso usando la tabla del inciso anterior, y defínala como `gastos_15`
+ 5. Repita el primer inciso usando la tabla del inciso anterior, y defínala como `gastos_15`
 
-- Si a las personas del IVM se les rebaja 9.84% del salario indicado, a las del magisterio un 24.86% del salario y a las del Poder judicial un 17.5% del salario, ¿cuánto se acumula en cada régimen? Asuma una tasa de interés del ahorro de los regímenes del 3%. Para este ejercicio, se le recomienda crear un dataframe con estos porcentajes. Revise bien los *nombres* de los regímenes para hacer los joins correspondientes.
+ 6. Si a las personas del IVM se les rebaja 9.84% del salario indicado, a las del magisterio un 24.86% del salario y a las del Poder judicial un 17.5% del salario, ¿cuánto se acumula en cada régimen? Asuma una tasa de interés del ahorro de los regímenes del 3%. Para este ejercicio, se le recomienda crear un dataframe con estos porcentajes. Revise bien los *nombres* de los regímenes para hacer los joins correspondientes.
 
-- Si el país quisiera aumentar la natalidad, y le ofrece un descuento del 5% de los impuestos a las personas que tienen un hijo, 6% a las personas que tienen dos hijos y 7% a las personas que tienen tres hijos o más, ¿cómo quedarían los gastos en valor del 2017 de las personas que tienen hijos?
+ 7. Si el país quisiera aumentar la natalidad, y le ofrece un descuento del 5% de los impuestos a las personas que tienen un hijo, 6% a las personas que tienen dos hijos y 7% a las personas que tienen tres hijos o más, ¿cómo quedarían los gastos en valor del 2018 de las personas que tienen hijos?
 
-- Si a las personas que ganan en dólares se les cobra en los gastos, en el 2017 un 10% extra de impuestos (o sea, el monto actual que pagan en gastos más el 10%), en el 2018 un 12%, en el 2019 un 13% y en el 2020 y 2021 un 14.5%. ¿Cuánto se gana el país extra en cada año por estos _impuestos_? 
-
-
-- Si además, a las personas que ganan en colones se les cobra sobre el monto de gastos, un 12% extra en el 2017, un 11.5% en el 2018, un 10.7% en el 2019, un 9.5% en el 2020, y un 8% en el 2021. Indique a cuales personas les serviría más ganar en la otra moneda.
+ 8. Si a las personas que ganan en dólares se les cobra en los gastos, en el 2018 un 10% extra de impuestos (o sea, el monto actual que pagan en gastos más el 10%), en el 2019 un 12%, en el 2020 un 13% y en el 2021 y 2022 un 14.5%. ¿Cuánto se gana el país extra en cada año por estos _impuestos_? 
 
 
-- Para cada año indique quienes están gastando más: ¿los hombres o las mujeres?
+ 9. Si además, a las personas que ganan en colones se les cobra sobre el monto de gastos, un 12% extra en el 2018, un 11.5% en el 2019, un 10.7% en el 2020, un 9.5% en el 2021, y un 8% en el 2022. Indique a cuales personas les serviría más ganar en la otra moneda.
 
-- ¿En cuál provincia tienen mejor ahorro?
+
+ 10. Para cada año indique quienes están gastando más: ¿los hombres o las mujeres?
+
+ 11. ¿En cuál provincia tienen mejor ahorro?
 
 
 ## Ejercicio 2:
 
 Este ejercicio es un poco más desarrollado que los anteriores, por lo que se separa del resto. Utilice las tablas originales.
 
-- ¿Cuál es la observación que muestra el mayor gasto?
+ 1. ¿Cuál es la observación que muestra el mayor gasto?
 
-- ¿Cuánto es el salario, en valor presente, mayor? Defina una variable que se llame `mi_max` para este salario.
+ 2. ¿Cuánto es el salario, en valor presente, mayor? Defina una variable que se llame `mi_max` para este salario.
 
-- Asuma que todos los gastos que se dan mayores a `mi_max`, en valor presente, son por algún tipo de riesgo asegurable. La empresa aseguradora _Riesgo S.A._ está ofreciendo un seguro en el que le cobra 100 000 colones anuales a todas las personas que se observan en la base de datos. 
+ 3. Asuma que todos los gastos que se dan mayores a `mi_max`, en valor presente, son por algún tipo de riesgo asegurable. La empresa aseguradora _Riesgo S.A._ está ofreciendo un seguro en el que le cobra 100 000 colones anuales a todas las personas que se observan en la base de datos. 
 
-Si este seguro cubre el 70% del monto en que se supera a `mi_max` (o sea, si `mi_max` es 100 y el gasto es de 200, entonces cubre `[200-100]*0.7`), y la empresa puede ahorrar usando una tasa de interés del 4% anual, y paga los reclamos del seguro al final del año. En valor del año 2021, ¿le es rentable tener este seguro?
+ 4. Si este seguro cubre el 70% del monto en que se supera a `mi_max` (o sea, si `mi_max` es 100 y el gasto es de 200, entonces cubre `[200-100]*0.7`), y la empresa puede ahorrar usando una tasa de interés del 4% anual, y paga los reclamos del seguro al final del año. En valor del año 2022, ¿le es rentable tener este seguro?
 
 
 
