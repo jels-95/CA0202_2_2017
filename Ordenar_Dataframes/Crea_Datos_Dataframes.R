@@ -82,7 +82,7 @@ datosSalario<- data.frame(Genero = sample(c('male','female'),total,replace = TRU
   ungroup()
 
 annos<- expand.grid(Nombre = datosSalario$Nombre,
-                    Anno = 2017:2019,
+                    Anno = 2018:2020,
                     Mes = 1:12,
                     stringsAsFactors = FALSE)
 
@@ -100,7 +100,7 @@ datosSalario<- datosSalario %>%
   ungroup() %>%
   filter(Volar <1) %>%
   select(-Volar) %>% 
-  filter(!((Nombre == 'Castillo, Omar') & (Anno == 2017) & (Mes == 2)))
+  filter(!((Nombre == 'Castillo, Omar') & (Anno == 2018) & (Mes == 2)))
 
 
 
