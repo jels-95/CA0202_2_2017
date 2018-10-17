@@ -13,7 +13,7 @@ library(dplyr)
 
 Para esta clase se le han entregado 3 sets de datos: 
 
-- Population_growth.csv
+- Infant_Deaths.csv
 
 - Life_tables_worlds.csv
 
@@ -23,10 +23,10 @@ La idea es que los pase a la forma que se le indica en su ejercicio correspondie
 
 ## Ejercicio 1
 
-Los datos de `Population_growth` indican qué porcentaje han crecido las poblaciones en los últimos años en varios países. Cargue los datos de `Population_growth` y reacomódelos para que se vean como la siguiente imagen:
+Los datos de `Infant_Deaths` indican la cantidad de muertes de niños en los últimos años en varios países. Cargue los datos de `Infant_Deaths` y reacomódelos para que se vean como la siguiente imagen:
 
 
-![Solucion population growth](Solucion_Pop_growth.png)
+![Solucion infant deaths](Solucion_Infant_deaths.png)
 
 
 
@@ -46,3 +46,36 @@ Una herramienta que se usa mucho en cursos de matemática actuarial, son las tab
 
 
 
+Luego, separe la columna de `Grupo_Edad` de forma tal que se incluyan ahora dos nuevas columnas, una de edad inicial y otra de edad final, ambas numéricas. Seleccione únicamente las columnas de Edades, Anno, Sexo y ex. La columna ex, lo que representa es la cantidad de años que se espera que la persona viva de ahora en adelante. 
+
+Vamos a calcular el promedio de vida de las personas que nacieron en cada año. 
+
+Primero, reordene el dataframe de forma tal que quede una única columna de edades, y en otra columna se indique si es de inicio o es de final. 
+
+Haga una nueva columna en donde se indique cuanto es el Anno menos la Edad, puede ponerle Nacimiento a esta columna. Y haga otra columna donde se calcula la suma de ex con la edad.
+
+Ahora, para cada año de nacimiento y sexo, calcule el promedio de esta última columna creada.
+
+
+
+```{r,eval=FALSE,echo=FALSE}
+Esperanza <- Life_tables_world %>% 
+  separate(Grupo_Edad,into = c('Edad_Inic','Edad_Fin','Annos'),sep = '[- ]') %>% 
+  select(Edad_Inic,Edad_Fin,Anno,Sexo,ex) %>% 
+  gather(key = 'Tipo',value = 'Edad',Edad_Inic,Edad_Fin) %>%
+  mutate(Edad = as.numeric(Edad)) %>% 
+  mutate(Nacimiento = Anno - Edad,
+         Esperanza_Vida_Al_Nacer = ex + Edad) %>% 
+  group_by(Nacimiento,Sexo) %>% 
+  summarise(Esperanza = mean(Esperanza_Vida_Al_Nacer,na.rm = TRUE))
+```
+<!----
+Luego, corra este código:
+```{r,eval=FALSE}
+tabla1 %>% 
+  ggplot()
+```
+---->
+
+
+Luego, vamos a ver porqué este procedimiento es incorrecto para obtener la esperanza al nacer.
