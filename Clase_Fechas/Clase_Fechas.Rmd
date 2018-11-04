@@ -12,11 +12,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Trabajar con fechas siempre es un dolor
 
-- ¿Todos los años tienen 365 días?
+>- ¿Todos los años tienen 365 días?
 
-- ¿Todos los días tienen 24 horas?
+>- ¿Todos los días tienen 24 horas?
 
-- ¿Todos los minutos tienen 60 segundos?
+>- ¿Todos los minutos tienen 60 segundos?
 
 ## `lubridate`
 
@@ -32,9 +32,9 @@ now()
 ## Formas de conseguir una fecha
 
 
->- De texto: `'2017-11-01'`
+>- De texto: `'2018-11-05'`
 
->- Componentes individuales: Año = `2017`, Mes = `11`, Día = `1`
+>- Componentes individuales: Año = `2018`, Mes = `11`, Día = `5`
 
 >- De otro objeto de fecha
 
@@ -85,7 +85,7 @@ load(file = 'Fechas.RData')
 Fechas_Nacimiento <- Nacimientos %>% 
   mutate(Fecha = ymd(Fecha))
 Hijos <- Hijos %>% 
-  mutate(Nacimiento_Hijo = ymd(Nacimiento_Hijo))
+  mutate(Nacimiento_Hijo = dmy(Nacimiento_Hijo))
 str(Fechas_Nacimiento)
 ```
 
@@ -135,11 +135,12 @@ Cree una columna con fecha **y** tiempo para la tabla de fallecimientos.
 
 ```{r}
 Fallecimientos <- Fallecimientos %>% 
-  transmute(Fecha_tiempo = make_datetime(year = Anno_Muerte,
-                           month = Mes_Muerte,
-                           day = Dia_Muerte,
-                           hour = Hora_Muerte,
-                           min = Minuto_Muerte),
+  transmute(Fecha_tiempo = make_datetime(
+    year = Anno_Muerte,
+    month = Mes_Muerte,
+    day = Dia_Muerte,
+    hour = Hora_Muerte,
+    min = Minuto_Muerte),
             ID)
 str(Fallecimientos)
 ```
@@ -166,11 +167,11 @@ Y también se puede convertir un objeto tipo `POSIXct` (tiempo) a fecha, usando 
 Además de las funciones tipo `ymd`, hay otras en las que se pueden especificar la hora, minuto y mes al objeto que se crea:
 
 ```{r}
-fecha_g <- ymd_hms('2017-10-20 15:35:20',
+fecha_g <- ymd_hms('2016-10-20 15:35:20',
                    tz = 'America/Guatemala')
-fecha_g_2 <- ymd_hm('2017-10-20 15:35',
+fecha_g_2 <- ymd_hm('2016-10-20 15:35',
                    tz = 'America/Guatemala')
-fecha_g_3 <- ymd_h('2017-10-20 15',
+fecha_g_3 <- ymd_h('2016-10-20 15',
                    tz = 'America/Guatemala')
 ```
 
@@ -188,16 +189,7 @@ Muchas veces no se ocupa toda la fecha, sino uno de sus componentes. Para esto s
 |`yday`   |día del año  |
 |`wday`   |día de la semana |
 
-\pause Las funciones `month`.`mday` tiene dos parámetros opcionales
-
-\pause
-Compruebe el valor en `fecha_g` de las funciones anteriores.
-
-
-## Ejercicio:
-
-Haga un gráfico de barras (en ggplot), usando el día de la semana de las fechas de nacimiento. 
-
+\pause Las funciones `month`.`mday` tiene dos parámetros opcionales \pause  Compruebe el valor en `fecha_g` de las funciones anteriores. Haga un gráfico de barras (en ggplot), usando el día de la semana de las fechas de nacimiento. 
 \pause
 Repita el gráfico anterior pero usando un `facet_wrap` con los meses. ¿Concluye algo distinto o similar? ¿Qué otro gráfico podría hacer?
 
@@ -302,7 +294,7 @@ Hijos %>%
 Muchas veces uno quiere trabajar con intervalos de tiempo, una duración (`duration`) es lo que se obtiene al sacar la diferencia entre dos fechas:
 
 ```{r}
-tiempo_lectivo <- today() - ymd(20170807)
+tiempo_lectivo <- today() - ymd(20180813)
 as.duration(tiempo_lectivo)
 ```
 
@@ -326,42 +318,39 @@ dyears(0:2)
 
 ## Ejercicios:
 
-¿Qué fecha fue hace: un año, 2 semanas y 96 horas?
+- ¿Qué fecha fue hace: un año, 2 semanas y 96 horas?
 
-¿Cuál es el ID que tuvo un hijo a la edad más joven?
+- ¿Cuál es el ID que tuvo un hijo a la edad más joven?
 
-¿Cuál es el ID que falleció teniendo el hijo más reciente?
+- ¿Cuál es el ID que falleció teniendo el hijo más reciente?
 
 ## Multiplicar duraciones
 
 También se pueden multiplicar duraciones, lo cual va a multiplicar la cantidad de segundos que corresponden a esa duración.
 
-```{r}
+```{r,warning=FALSE}
 today() + (dyears(1)+ ddays(25) - dweeks(7))*2
 ```
 
 ## Fallas de duraciones
-
-¿Qué pasa si nos devolvemos un año desde el primero de enero? 
+¿Qué pasa si nos devolvemos dos año desde el primero de enero? 
 \pause
-
 ```{r}
-ymd(20170101) - dyears(1)
+ymd(20180101) - dyears(2)
 ```
 
 **¡Falla!** \pause
 Pues el 2016 es año bisiesto, por lo que tiene 366 días. \pause Si tuviéramos horario de veranos también perderíamos una hora en ciertos días del año.
 
 ```{r}
-fecha_falla <- ymd_hms('20170312 00:00:00',tz = 'America/New_York')
+fecha_falla <- ymd_hms('20170312 00:00:00',
+                       tz = 'America/New_York')
 fecha_falla + ddays(1)
 ```
 
 Un día de 25 horas... Casual...
 
 ## Periodos
-\pause
-
 
 ## Periodos
 \pause
@@ -411,17 +400,14 @@ Incluir los meses tiene un _costo_ implícito, que es que no todas las fechas es
 3. 30 de abril
 
 ## Meses
-
 Solo la primera de estas opciones cumple el hecho de que $a + b - b = a$. Pero las otras opciones también están implementadas, o se puede obtener usando un poco de aritmética sencilla:
-
 ```{r}
-marzo31 <- ymd(20170331)  
+marzo31 <- ymd(20180331)  
 marzo31 + months(1)
 marzo31 + days(31)
 marzo31 %m+% months(1) # Para restar se usa %m-%
 ```
-
-Pero se tiene que tener **mucho** cuidado con el orden, pues no lo preservan...
+Hay que tener **mucho** cuidado con el orden, pues no lo preservan...
 
 ## Intervalos
 
@@ -502,6 +488,13 @@ Para mover un intervalo se puede usar `int_shift`, indicando el intervalo y la c
 ```{r}
 int_shift(inv_2,by = days(1))
 int_shift(inv_2,by = months(1))
+```
+
+## Mover un intervalo
+
+Note que como `months` es una duración, al agregarlo a la fecha de inicio, queda una fecha inexistente. Por lo que deja de existir el intervalo. Sin embargo, si agregamos una duración sí se obtiene un valor:
+```{r}
+int_shift(inv_2,by = duration(1,units = 'months'))
 ```
 
 
