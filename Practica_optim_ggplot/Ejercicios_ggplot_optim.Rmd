@@ -1,7 +1,7 @@
 ---
 title: "Ejercicios optim y ggplot"
 author: "Jorge Loría"
-date: "Oct 25, 2017"
+date: ""
 output: html_document
 ---
 
@@ -36,7 +36,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 9. Haga un gráfico de `freqpoly` de las ganancias de las empresas que están en el dataframe `Top10`, usando para colorear la Industria a la que pertenece. Aplique una escala logarítmica en el eje x, y en freqpoly incluya el parámetro `bins = 45`.
 
-10. En `Top10` agregue una nueva columna, que sea el grupo de miles en que está el `rank` de esa empresa (_Sugerencia_: tome parte entera de (rank -1)/1000), usando `factor` al definir esta variable. Haga un gráfico de barras en que las barras sean de las industrias, y los colores sean del grupo de miles que definió al inicio. Incluya en `geom_bar` los parámetros: `color = 'black'`, y `position = 'dodge'`.
+10. En `Top10` agregue una nueva columna, que sea el grupo de miles en que está el `rank` de esa empresa (_Sugerencia_: tome parte entera de (rank -1)/1000), usando `factor` al definir esta variable). Haga un gráfico de barras en que las barras sean de las industrias, y los colores sean del grupo de miles que definió al inicio. Incluya en `geom_bar` los parámetros: `color = 'black'`, y `position = 'dodge'`.
 
 Repita este gráfico usando los datos originales, y note que las leyendas del eje X se ven poco claras. Gire el gráfico usando `coord_flip`.
 
@@ -63,7 +63,7 @@ w_i = 1 + \frac{x_i -1}{4}
 $$
 para cada $i = 1, \dots, d$.
 
-Usando `optim` encuentre el __máximo__ para $9$ dimensiones en el cubo $[-10,10]^9$.  El parámetro `control` recibe una **lista** de parámetros opcionales (que ya tiene predefinidos). Para maximizar, debe incluir en la lista `fnscale = -1`.
+Usando `optim` encuentre el __máximo__ para $9$ dimensiones en el cubo $[-10,10]^9$.  El parámetro `control` recibe una **lista** (`list`) de parámetros opcionales (que ya tiene predefinidos). Para maximizar, debe incluir en la lista `fnscale = -1`.
 
 4. Intente encontrar el mínimo de la función $g(x) = 1-x^2$, sin definir un intervalo. 
 
@@ -75,7 +75,49 @@ $$
 $$
 
 
-Esta función tiene usos en probabilidad, y se le llama función de distribución de la normal con **media** $\mu$, y **varianza** $\sigma^2$. Grafique esta función y optimícela (¿máximo o mínimo?), fijando $\mu = 1500$ y $\sigma = 500$.
+Esta función tiene usos en probabilidad, y se le llama función de distribución de la normal con **media** $\mu$, y **varianza** $\sigma^2$. Grafique esta función en el intervalo $[0,3500]$ y optimícela (¿máximo o mínimo?), fijando $\mu = 1500$ y $\sigma = 500$.
+
+
+
+## **Extra**
+
+Corra el siguiente código:
+
+
+```{r,eval=FALSE}
+squig <- function(x)sin(3*x)/150 - 1/70
+eyes <- data_frame(x = c(-1,1),y = 0.06)
+
+mouth <- data_frame(x = 0,y = 0.04)
+
+minorm <- function(x,mean,sd)exp(-(x-mean)^2/(2*sd^2))/(sqrt(2*pi)*sd)
+
+plot1 <- ggplot(mapping = aes(x = c(-10,10))) + 
+  geom_area(stat = 'function',fun = minorm,fill = 'white',
+            args = list(mean = 0, sd= 4)) + 
+  geom_point(data = eyes,aes(x=x,y=y),size = 15) + 
+  geom_point(data = mouth,aes(x=x,y=y),size = 30) + 
+  stat_function(fun = squig,n = 200,geom = 'area',fill = 'white') + 
+  theme_dark() + 
+  labs(x = '',
+       y = '') +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        axis.ticks.x=element_blank(),axis.ticks.y=element_blank(),
+        axis.text.y=element_blank(),axis.text.x=element_blank())
+```
+
+
+A partir de esto responda: 
+
+ 0. Identifique la figura que se forma y agregue un título apropiado.
+ 1. ¿Qué hace `geom_area`? ¿Cómo queda el gráfico si se quita esta linea?
+ 2. Vuelva a crear el gráfico, pero que un ojo sea más grande que otro. ¿Si quisiera cambiar el ojo más grande qué comando usa?
+ 3. Agregue un título apropiado
+ 4. ¿Qué sucede si se quita el comando de `labs`? ¿Y el de `theme`?
+ 5. ¿Cree que se pueda hacer el mismo gráfico pero usando un solo data.frame en lugar de dos y que tome en cuenta ojos y boca a la vez?
+ 6. 
+
+
 
 
 

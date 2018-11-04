@@ -1,7 +1,7 @@
 ---
 title: "Optimizar"
 author: "Jorge Loría"
-date: "October 22, 2017"
+date: ""
 output: beamer_presentation
 ---
 
@@ -14,7 +14,7 @@ library(ggplot2)
 ## Optimizar
 
 \pause
-Siempre se quiere optimizar algo, ya sea minimizar pérdidas, maximizar utilidades, entre otras... 
+Siempre se quiere optimizar __algo__, ya sea minimizar riesgos, maximizar utilidades, minimizar costos, entre otras... 
 
 Para esto existe una función en R que permite encontrar los puntos máximos y mínimos de una __función__ que puede recibir como parámetro. Esta función es muy flexible y se aprovecha de lo que vimos en la clase de funciones en que se pueden mandar funciones como parámetros de otras funciones.
 
@@ -260,7 +260,7 @@ opt_4 <- optim(par = c(0.2,0.2),c_4)
 
 
 ## Gradiente
-También se puede incluir el gradiente para realizar la optimización, este debe ser una función que retorne un vector de `n` variables, con `n` la cantidad de entradas que recibe la función a optimizar
+También se puede incluir el gradiente para realizar la optimización, este debe ser una función que retorne un vector de `n` variables, con `n=` la cantidad de entradas que recibe la función a optimizar
 
 Recordando c_3, sabemos que la función es simétrica en sus entradas, y que cada una de sus derivadas va a ser igual, pero cambiando la variable.
 
@@ -350,3 +350,105 @@ Repita el ejercicio anterior, pero usando 3, 4 y 5 variables.
 \pause
 
 Programe una función que reciba un entero positivo, y que realice la minimización anterior para esa cantidad de variables.
+
+
+
+## Restricciones lineales
+
+Hasta el momento nos hemos limitado a usar restricciones donde las variables sobre las que se maximizan pueden no "depender" entre sí. Sin embargo, para el caso general, se quiere resolver el siguiente problema:
+
+\begin{align*}
+\min_{x\in \mathbb{R}^n}f(x)\\
+\text{tal que:}\\
+g_i(x)\geq c_i 
+\end{align*}
+
+
+Donde $g_i(x)$ son funciones lineales. \pause Las restricciones anteriores se pueden expresar de la manera:
+
+\begin{align*}
+Ax\geq c
+\end{align*}
+
+Donde $A$ es una matriz de $m\times n$, $c\in \mathbb{R}^m$, y la desigualdad es entrada por entrada.
+
+## Ejemplo restricciones
+
+Programe la función:
+
+\begin{align*}
+f(x) = \frac{1}{2}\sum_{i=1}^n (x_i^4 - 16x_i^2 + 5x_i)
+\end{align*}
+
+\pause
+```{r}
+restr_lin1 <- function(x){
+  1/2*sum(x^4 - 16*x^2+5*x)
+}
+```
+
+
+## Optimice
+
+Si la función anterior está definida para $x_i\in[-5,5]$, optimícela para $n = 5$, comience en el origen.
+
+\pause
+Para $n$ dimensiones, se minimiza en $x_i=-2.903534$ :
+
+```{r}
+optim(par = rep(0,5),fn = restr_lin1,method = 'L-BFGS-B',
+      lower = rep(-5,5),upper = rep(5,5))
+```
+
+
+## Restricción linear:
+
+Si nos quedamos en dos dimensiones. Y definimos que $x + y >= 2$ la función `optim` ya no nos funciona :( \pause Entonces, vamos a usar la función: `constrOptim`, que funciona de una forma muy similar, pero hay que agregarle la matriz $A$ que mencionamos anteriormente, y el vector de restricciones.
+\pause
+
+```{r}
+mat_A <- matrix(data = c(1,1),nrow = 1)
+const_c <- 2
+constrOptim(theta = c(1.5,1.5),f = restr_lin1,grad = NULL,
+            ui = mat_A,ci = const_c)
+```
+
+
+
+## ¿Qué hay mal en lo anterior?
+
+\pause
+No consideramos que $x,y \in[-5,5]$. Entonces tal vez nos hubiéramos podido salir... ¿Cómo podemos hacer para incorporar eso en `constrOptim`? \pause Note que podemos incluir las restricciones: $x_i \geq -5$ y $x_i \leq 5$. \pause Para esto hacemos:
+
+\pause
+
+```{r}
+a1 <- diag(x = 1,nrow = 2)
+a2 <- -a1
+mat_A2 <- rbind(a1,a2,mat_A)
+const_c2 <- c(-5,-5,-5,-5,const_c)
+constrOptim(theta = c(1.5,1.5),f = restr_lin1,grad = NULL,
+            ui = mat_A2,ci = const_c2)
+```
+
+
+## Otra restricción!
+Agreguemos que $x-y \geq 1$: \pause
+
+```{r}
+mat_A3 <- rbind(mat_A2,c(1,-1))
+const_c3 <- c(const_c2,1)
+constrOptim(theta = c(2.6,1.5),f = restr_lin1,grad = NULL,
+            ui = mat_A3,ci = const_c3)
+```
+
+
+## Ejercicio
+
+Optimice `restr_lin1` con $n=4$, tal que: $x_i\geq 1 + x_{i+1}$, siempre en la región original donde se definió.
+
+Calcule el gradiente de la función, con n dimensiones, e inclúyalo en la llamada.
+
+Encuentre el máximo en $n=2$ tal que: $x + 1 \leq y$, $y \geq \frac{-3}{5}x -3$, $y\geq 15x-55$: 
+
+
