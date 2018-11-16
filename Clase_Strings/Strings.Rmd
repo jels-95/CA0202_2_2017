@@ -1,0 +1,487 @@
+---
+title: "Strings"
+author: "Jorge Loría"
+date: ""
+output: beamer_presentation
+classoption: aspectratio=169
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Strings básicos
+
+Ya hemos trabajado con strings dentro de dataframes, sin embargo no hemos tenido la oportunidad de trabajarlos por su cuenta. Para esto usamos el paquete:
+
+```{r}
+library(stringr)
+```
+
+\pause
+
+Una parte es aprender sobre expresiones regulares en su generalidad, y otra parte es aprender sobre las funciones específicas que trabaja `stringr`.
+
+## Expresiones básicas
+
+Las barras inclinadas: `\`, tienen diversos propósitos dentro de los strings. Por ejemplo, si se quiere incluir una comilla en un string antes se debe poner `\`. `'\''`. Además, se puede hacer `'"'`, `"'"`, `"\""`, etc...
+
+\pause 
+
+Otra manera en que se suelen usar es para ejecutar caracteres tipo **UTF-8**, por ejemplo:
+```{r}
+s1 <- '\u00a2'
+```
+
+\pause
+
+Si se quiere ver el símbolo generado, se puede usar la función `writeLines`:
+
+```{r}
+writeLines(s1)
+```
+
+## Dos expresiones muy frecuentes
+
+Dos expresiones que aparecen en _toooodo_ lado, porque las usamos en todo lado son: `'\t'` y `'\n'`. Que representan, un _tab_ y una línea nueva, respectivamente.
+
+Ejercicio: Use `writeLines` para ver cómo se ven estos strings: `'a\tack'`, y `'bue\no'`.
+
+## Funciones básicas
+
+Inicialmente solo vamos a trabajar con `str_extract`, pero también se puede considerar `str_view` y ven las coincidencias en el __Viewer__ de RStudio en una forma más cómoda.
+
+\pause
+
+```{r}
+f1 <- c("piña", "naranja", "limón")
+str_match(f1, "an")
+```
+
+
+## Expresiones regulares
+
+> Cuando usted tiene un problema y lo ataca con una expresión regular, entonces tiene dos problemas.
+
+Por ejemplo, [la expresión regular para calzar un correo electrónico](http://www.ex-parrot.com/~pdw/Mail-RFC822-Address.html).
+
+\pause
+
+```{r}
+f2 <- c("manzana", "banano", "pera")
+str_match(f2, "n")
+```
+
+<!---
+## Calcen
+--->
+
+## Anclas
+
+![Otro tipo de ancla](Ancla.png)
+
+
+## Anclas 
+
+Hay dos anclas:
+
+- `'^'`: lo que lo sigue es lo que va al inicio del string.
+
+- `'$'`: lo que viene antes es lo que va al final del string.
+
+\pause
+
+Para recordarlo: _'Begin with power, you end with money'_
+
+\pause
+
+Por ejemplo, si quiero obtener las palabras que comiencen con `'a'`, pongo: `'^a'` y si quiero las que terminan con `'a'`, pongo `'a$'`.
+
+## Ejercicio
+
+La función que indica si un string contiene o no (booleano) una expresión, es `str_detect`. 
+
+Sabiendo esto, y usando `ggplot2::luv_colours$col`, identifique cuántos coloes comienzan con `'blue'`, y cuantas terminan con `'red'`.
+
+
+
+
+## Otras expresiones
+
+- `'.'`: cualquier caracter.
+
+- `'\\d'`: dígitos
+
+- `'\\s'`: espacios en blanco
+
+- `'[asdf]'`: cualquiera de a, s, d ó f.
+
+- `'[^qwer]'`: cualquiera que **NO** sea q, w, e ó r.
+
+- `asdf|uiop`: si es asdf ó uiop
+
+## Por ejemplo
+
+Si queremos ver los colores que comienzan con 'w' o 't' y luego va una 'h', podemos hacer:
+
+
+```{r,warning=FALSE,message=FALSE}
+library(tidyverse)
+luv_colours %>% 
+  filter(str_detect(col,'^[wt]h'))
+```
+
+## `[]`
+Los paréntesis cuadrados tienen una peculiaridad: si se incluye un caracter especial adentro, van a dar una coincidencia aunque no se 'escape':
+
+```{r}
+str_extract(c('au.ge','Hola.','ca.lza'),'a[.]')
+```
+
+\pause
+
+Repita lo anterior, pero sin usar los paréntesis cuadrados.
+
+
+## `[]`
+
+Dentro de los paréntesis cuadrados se pueden indicar más cosas, como que sea parte del alfabeto, usando: `[A-z]`. Por ejemplo, si queremos buscar todos los colores que terminan con una letra del alfabeto, usamos:
+
+
+```{r,eval=FALSE}
+luv_colours %>% 
+  filter(str_detect(col, "[A-z]$"))
+```
+
+Si queremos que solo coincida en letras minúsculas, cambiamos la 'A' por una 'a'.\pause Y si solo queremos las mayúsculas, cambiamos la 'z' por una 'Z'. Además, podemos preguntar por dígitos, usando `[:digit:]`. \pause Si buscamos todos los colores que terminen con una letra y un número, hacemos:
+
+```{r}
+luv_colours %>% 
+  filter(str_detect(col, "[A-z][:digit:]$"))
+```
+
+
+
+
+## |
+
+Es un _o_, simple y sencillo. El problema es que tiene prioridad sobre las demás expresiones, entonces, uno puede usar _(_ paréntesis _)_ para poder señalar el orden de prioridad. Por ejemplo:
+
+```{r}
+cas <- c('cas','caza','casa','zorro')
+str_detect(cas,'ca(s|z)')
+```
+
+\pause
+
+Si no le ponemos paréntesis:
+
+```{r}
+str_detect(cas,'cas|z')
+```
+
+
+## Ejercicios
+
+- ¿Cuántos colores terminan con un 4?
+
+- ¿Hay algún color que comience con un dígito?
+
+- ¿Cuántos colores hay que sean exactamente 3 caracteres cualesquiera, y el cuarto y último sea un número?
+
+\pause
+
+`r luv_colours$col %>% str_detect('4$') %>% sum()`
+
+\pause
+
+`r luv_colours$col %>% str_detect('^\\d') %>% any()`
+
+\pause
+
+`r luv_colours$col %>% str_detect('^...\\d$') %>% sum()`
+
+
+## Repeticiones 
+
+![Otro tipo de repeticiones](Repeticiones.jpg)
+
+## Repeticiones
+
+Muchas veces a uno le interesa ver si un caracter apareció cierta cantidad de veces. Para esto usamos:
+
+
+- `'?'`: 0 ó 1 vez
+
+- `'+'`: 1 vez o más
+
+- `'*'`: 0 veces o más
+
+- `'{n}'`: exactamente $n$ veces
+
+- `'{n,}'`: al menos $n$ veces
+
+- `'{n,m}'`: entre $n$ y $m$ veces
+
+<!---
+- `'{,m}'`: a lo más $m$ veces
+--->
+
+
+## Repeticiones, ejemplo:
+
+Por ejemplo, si se quieren revisar si tienen dos o más zetas:
+
+```{r}
+f3 <- c('pizza','grizzly','sizzler','drizzzler','caza')
+str_extract(f3,pattern = 'z{2,}')
+```
+
+O si se quiere revisar entre 1 y cuatro:
+```{r}
+str_extract(f3,pattern = 'z{1,4}?')
+```
+
+## Ejercicio
+
+- Encuentre todos los colores que comiencen con al menos 3 consonantes.
+
+- Encuentre todos los colores que tengan al menos dos números seguidos.
+
+
+## Referenciar
+
+Muchas veces a uno le interesa revisar un patrón más de una vez, para esto se pueden 'agrupar' usando los paréntesis, y al usar `'\\1'` se hace referencia a ese valor.
+
+```{r,eval=FALSE}
+str_view(fruit, "(..)\\1", match = TRUE)
+```
+
+Si se quieren los colores que comiencen y terminen con la misma letra, se puede hacer:
+
+```{r}
+luv_colours %>% 
+  filter(str_detect(col, "^(.).*\\1$")) %>% 
+  select(col)
+```
+
+
+## Más grupos
+
+Si queremos una expresión que haga referencia a más de un grupo, podemos usar otros números.
+
+
+```{r}
+luv_colours %>% 
+  filter(str_detect(col, "^(.).*(.).*\\2.*\\1$")) %>% 
+  select(col)
+```
+
+\pause 
+¿Qué buscamos si en la expresión anterior cambiamos el 1 por el 2 y viceversa?
+
+
+## Ejercicio
+
+- Encuentre todos los colores que tengan una vocal repetida y terminen con una no-vocal.
+<!------
+```{r}
+```
+---->
+
+- Encuentre todos los colores que terminen con dos números iguales.
+
+
+## Buscar
+\pause 
+
+![Pero no con google](Buscar.png)
+
+## Buscar alrededor 
+
+Algunas veces a uno le interesa que coincida un valor que está próximo, pero que no sea parte del resultado. Para esto usamos los operadores 'look around':
+
+- `'(?=algo)'`: revisa si 'algo' está justo delante
+
+- `'(?!puede)'`: revisa si 'puede' NO está justo delante
+
+- `'(?<=estar)'`: revisa si 'estar' está justo atrás
+
+- `'(?<!oNO)'`: revisa si 'oNO' NO está justo atrás
+
+## Buscar alrededor
+
+
+```{r}
+montos <- c('$100', '186 dolares','295 dolares', '$1580')
+str_detect(montos,'\\d+\\s(?=dolares)')
+```
+\pause
+
+Todavía no lo corran. Veánlo y piensen porqué da este resultado:
+```{r}
+str_detect(montos,'(?<!\\$)\\d{3,}')
+```
+\pause
+
+¿Cómo podríamos modificarlo para que solo calce con los que NO tienen el símbolo de dólares?
+
+## Herramientas
+\pause
+
+![Herramientas!](Toolbox.jpg)
+
+
+## Herramientas
+
+>- `str_view`: para ver
+
+>- `str_detect`: identifica si contiene la expresión
+
+>- `str_match`: toma la parte de la expresión que coincide, lo pone en forma matricial
+
+>- `str_extract`: toma la parte de la expresión que coincide, lo pone en un vector
+
+>- `str_subset`: toma los strings que cumplen la condición, es como combinar el filter y el detect
+
+>- `str_count`: cuenta cuantas veces en el string se dio la coincidencia
+
+
+## subset
+
+Por ejemplo, si yo quiero tomar únicamente los colores que comienzan con una no-vocal, y terminan con esa misma letra, hago:
+
+```{r}
+luv_colours$col %>% 
+  str_subset(pattern =  "^([^aeiou]).*\\1$")
+```
+
+
+## Quijote
+
+Vamos a usar el primer capítulo del Quijote, que está en formato txt, y para leerlo usamos:
+\pause
+
+```{r,warning=FALSE}
+quijote <- readLines('Quijote_Capitulo_Primero.txt',
+                     encoding = 'UTF-8')
+```
+
+\pause
+Si queremos ver cuantas veces por linea aparece 'con', usamos:
+
+```{r}
+quijote %>% str_count(pattern = 'con')
+```
+
+## all
+
+Es posible que se den múltiples coincidencias dentro de una misma frase que uno indique, si uno ocupara todas, puede hacer:
+
+```{r}
+quijote %>% 
+  str_extract_all('de',simplify = TRUE)
+```
+
+
+## all
+¿Qué pasa si no pone `simplify = TRUE`?
+
+\pause
+También está `str_match_all`, que hace algo similar, pero no tiene simplify, y da un formato distinto:
+
+```{r}
+quijote %>% # Qué puede reemplazar a {0,1}?
+  str_match_all('don{0,1}') 
+```
+
+## `sub`
+
+Una función particularmente útil, es `str_sub`, que toma la porción del string que se le indica, con base en el número de letras:
+
+```{r}
+f3 %>% 
+  str_sub(start = 3,end = 5)
+```
+
+¿Qué pasa si el `end` queda después de la última letra?
+
+\pause
+
+No agrega más :)
+
+
+
+## `replace`
+
+Reemplaza. Modifica en la las partes donde haya coincidencia con el patrón, y reemplaza con lo que se indique:
+
+```{r}
+f3 %>% 
+  str_replace(pattern = 'z{1,2}',
+              replacement = 'AAA')
+```
+
+## all
+
+Esta función también viene con una versión all, y hace el reemplazo en todos los lugares donde haya coincidencia:
+
+```{r}
+f3 %>% 
+  str_replace_all(pattern = 'z{1,2}',
+              replacement = 'OEOE')
+```
+
+## `str_c`
+
+Pega vectores... de forma vectorial:
+
+```{r}
+str_c(1:13,letters,sep = '|-k-|')
+```
+
+\pause
+
+Vamos a 'pegar' todo el capítulo en un solo string:
+
+```{r}
+quijote1 <- str_c(quijote,collapse = ' ')
+```
+
+
+## Más herramientas
+
+>- `str_length`: indica la cantidad de letras que tiene una palabra `str_length('mas')` da `r str_length('mas')`
+
+>- `str_to_lower`: transforma los strings a letras minúsculas `str_to_lower('No eS AbuRrIdO')` da: `r str_to_lower('No eS AbuRrIdO')`
+
+>- `str_to_upper`: pasa a mayúsculas `str_to_upper('Algo interesante')` da: `r str_to_upper('Algo interesante')`
+
+>- `str_to_title`: pone la primera letra de cada palabra en mayúscula y las demás a minúscula, `str_to_title('eSte Es un tiTuLo')` da: `r str_to_title('eSte Es un tiTuLo')`
+
+
+>- `str_replace_na`: quita los NAs y los transforma en un string que dice 'NA' 
+
+## `str_split`
+\pause
+
+Se usa para separar strings según la expresión que se indique. En este caso, vamos a separar el resultado anterior, por medio de los espacios:
+
+```{r,eval=FALSE}
+quijote1 %>% 
+  str_split('\\s')
+```
+
+Con lo que se obtienen todas las palabras del primer capítulo del Quijote :)
+
+
+## Ejercicios
+
+>- ¿Cuantos números aparecen en el capítulo del Quijote?
+
+>- ¿Cuantas veces aparece 'ella' en el capítulo del quijote? ¿Y 'el'? ¿Como puede asegurarse que no sea un 'ella'
+
+>- ¿Como se lee la segunda línea si modificamos las vocales por por 'u'?
+
+>- Cree un dataframe con las palabras del capítulo del quijote. Elimine las de longitud cero y las demás páselas a minúscula. Cuente cuantas veces aparece cada palabra, e identifique cuantas de las palabras observadas comienzan con 'qu'. ¿Siempre que aparece una 'q' aparece una 'u' después? ¿Qué sucede más una 'qui' o una 'que'?
+

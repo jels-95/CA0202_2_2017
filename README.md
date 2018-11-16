@@ -37,6 +37,9 @@ Para sacarle el mejor provecho a las presentaciones que se incluyen se recomiend
 8. Fechas
 
  Se tratan varias formas para lidiar con fechas, a partir del paquete `lubridate`
+ 
+10. Strings
+ Se abarca el uso de expresiones regulares, en el contexto del paquete 'stringr'
 
 9. Latex y Beamer
 
@@ -57,10 +60,9 @@ Entre los temas que me gustaría expandir estas presentaciones están:
 
 1. Trabajar con el paquete funcional `purrr`
 
-2. Trabajar con strings utilizando el paquete `stringr`
 
-3. Trabajar más a fondo con factores a partir del paquete `forcats`
+2. Trabajar más a fondo con factores a partir del paquete `forcats`
 
-4. 
+3. 
 
 
